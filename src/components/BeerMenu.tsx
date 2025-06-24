@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { sanityClient } from '../lib/sanity';
 import { Beer as BeerIcon, Hop, Award, GlassWater } from 'lucide-react';
 import { useInView } from 'react-intersection-observer';
 
@@ -32,30 +31,24 @@ export default function BeerMenu() {
   const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.15 });
 
   useEffect(() => {
-    setLoading(true);
-    sanityClient
-      .fetch<Beer[]>(
-        `*[_type == "beer"] | order(featured desc, name asc) {
-          _id,
-          name,
-          abv,
-          ibu,
-          description,
-          type,
-          price,
-          available,
-          featured,
-          image { asset->{url} }
-        }`
-      )
-      .then((data) => {
+    async function fetchBeers() {
+      setLoading(true);
+      try {
+        const response = await fetch('/api/beers');
+        if (!response.ok) {
+          throw new Error(`Failed to fetch beers: ${response.status}`);
+        }
+        const data = await response.json();
         setBeers(data);
-        setLoading(false);
-      })
-      .catch((err) => {
+      } catch (err) {
+        console.error('Error fetching beers:', err);
         setError('Failed to load beers.');
+      } finally {
         setLoading(false);
-      });
+      }
+    }
+
+    fetchBeers();
   }, []);
 
   const filteredBeers = showAvailable ? beers.filter((b) => b.available) : beers;
@@ -518,4 +511,4 @@ export default function BeerMenu() {
       `}</style>
     </section>
   );
-} 
+}

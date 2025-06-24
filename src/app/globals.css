@@ -164,15 +164,15 @@
   }
 }
 
-/* Layout and scrolling styles */
+/* Layout and scrolling styles - FIXED */
 html,
 body {
-  max-width: 100vw;
+  max-width: 100%;
   overflow-x: hidden;
 }
 
 html {
-  scroll-behavior: smooth;
+  /* Removed conflicting scroll-behavior: smooth */
   scroll-padding-top: 80px;
 }
 
@@ -195,4 +195,19 @@ body {
   .section-divider-hero-menu svg {
     height: 36px !important;
   }
+}
+
+/* Performance optimizations for scroll-triggered animations */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Better hardware acceleration for smooth scrolling */
+* {
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
 }

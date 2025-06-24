@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 const navCards = [
   {
@@ -37,10 +37,14 @@ export default function Hero() {
   // State for unplugged effect
   const [unplugged, setUnplugged] = useState(false);
   const [powerSurge, setPowerSurge] = useState(false);
-  const [pageLoaded, setPageLoaded] = useState(false); // For page load lighting
-  const [getUnpluggedFlicker, setGetUnpluggedFlicker] = useState(false); // For flicker animation
-  const [showGetUnplugged, setShowGetUnplugged] = useState(true); // For controlling text fade out
+  const [pageLoaded, setPageLoaded] = useState(false);
+  const [getUnpluggedFlicker, setGetUnpluggedFlicker] = useState(false);
+  const [showGetUnplugged, setShowGetUnplugged] = useState(true);
   const sectionRef = useRef<HTMLDivElement>(null);
+  
+  // Cache calculations for better performance
+  const triggerPoint = useRef<number | null>(null);
+  const isTransitioning = useRef(false);
 
   // Page load lighting effect
   useEffect(() => {
@@ -52,51 +56,87 @@ export default function Hero() {
     return () => clearTimeout(timer);
   }, []);
 
-  // Scroll trigger at 25% of banner height (no parallax)
+  // Throttled scroll handler for better performance
+  const handleScroll = useCallback(() => {
+    if (isTransitioning.current) return;
+    
+    // Calculate trigger point only once or when necessary
+    if (triggerPoint.current === null && sectionRef.current) {
+      const rect = sectionRef.current.getBoundingClientRect();
+      const top = rect.top + window.scrollY;
+      triggerPoint.current = top + rect.height * 0.25;
+    }
+
+    const scrollY = window.scrollY;
+    const trigger = triggerPoint.current;
+    
+    if (trigger === null) return;
+
+    if (!unplugged && scrollY > trigger) {
+      isTransitioning.current = true;
+      setPowerSurge(true);
+      setTimeout(() => {
+        setUnplugged(true);
+        setTimeout(() => {
+          setPowerSurge(false);
+          isTransitioning.current = false;
+        }, 200);
+      }, 150);
+    } else if (unplugged && scrollY <= trigger) {
+      isTransitioning.current = true;
+      setPowerSurge(true);
+      setTimeout(() => {
+        setUnplugged(false);
+        setTimeout(() => {
+          setPowerSurge(false);
+          isTransitioning.current = false;
+        }, 200);
+      }, 150);
+    }
+  }, [unplugged]);
+
+  // Throttle scroll events for better performance
   useEffect(() => {
-    const handleScroll = () => {
-      if (sectionRef.current) {
-        // Unplugged trigger at 25% of banner height
-        const rect = sectionRef.current.getBoundingClientRect();
-        const height = rect.height;
-        const top = rect.top + window.scrollY;
-        const scrollY = window.scrollY;
-        const trigger = top + height * 0.25;
-        if (!unplugged && scrollY > trigger) {
-          setPowerSurge(true);
-          setTimeout(() => {
-            setUnplugged(true);
-            setTimeout(() => setPowerSurge(false), 200);
-          }, 150);
-        } else if (unplugged && scrollY <= trigger) {
-          setPowerSurge(true);
-          setTimeout(() => {
-            setUnplugged(false);
-            setTimeout(() => setPowerSurge(false), 200);
-          }, 150);
-        }
+    let ticking = false;
+    
+    const throttledScroll = () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          handleScroll();
+          ticking = false;
+        });
+        ticking = true;
       }
     };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [unplugged]);
+
+    window.addEventListener('scroll', throttledScroll, { passive: true });
+    return () => window.removeEventListener('scroll', throttledScroll);
+  }, [handleScroll]);
+
+  // Reset trigger point on resize
+  useEffect(() => {
+    const handleResize = () => {
+      triggerPoint.current = null;
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Enhanced Get Unplugged text behavior
   useEffect(() => {
     let flickerTimeout: NodeJS.Timeout;
     let hideTimeout: NodeJS.Timeout;
     if (unplugged) {
-      // When unplugged, keep text bright for 2.5s, then flicker, then fade out
       setShowGetUnplugged(true);
       flickerTimeout = setTimeout(() => {
         setGetUnpluggedFlicker(true);
         hideTimeout = setTimeout(() => {
           setShowGetUnplugged(false);
           setGetUnpluggedFlicker(false);
-        }, 700); // Flicker duration
-      }, 2500); // Stay bright for 2.5s
+        }, 700);
+      }, 2500);
     } else {
-      // When plugged, show text immediately
       setShowGetUnplugged(true);
       setGetUnpluggedFlicker(false);
     }
@@ -115,10 +155,10 @@ export default function Hero() {
     <section
       id="hero"
       ref={sectionRef}
-      className={`relative min-h-screen flex items-center justify-center text-center overflow-hidden hero-root ${stateClass} ${surgeClass} ${loadedClass}`}
+      className={`relative min-h-screen flex items-center justify-center text-center hero-root ${stateClass} ${surgeClass} ${loadedClass}`}
       aria-live="polite"
     >
-      {/* Parallax Background (now static) */}
+      {/* Background - removed transform for better performance */}
       <div
         className="absolute inset-0 w-full h-full z-0 bg-cover bg-center transition-all duration-700"
         style={{
@@ -129,19 +169,23 @@ export default function Hero() {
       {/* Overlays */}
       <div className="absolute inset-0 z-10 hero-overlay" />
       <div className="absolute inset-0 z-20 pointer-events-none hero-gradient" />
+      
       {/* Content */}
       <div className="relative z-40 flex flex-col items-center justify-center w-full px-4 py-16 sm:py-32 animate-hero-fade-in">
         {/* Logo */}
         <img src="/favicon.webp" alt="Unplugged Brewery Logo" className="w-24 h-24 sm:w-36 sm:h-36 mb-4 rounded-full shadow-lg border-4 border-brewery-gold bg-white/80 object-contain logo-img" />
+        
         {/* Title */}
         <h1 className="text-[clamp(2rem,7vw,6rem)] sm:text-[clamp(2.5rem,8vw,6rem)] font-extrabold text-brewery-gold drop-shadow-xl tracking-tight mb-2 font-hero relative hero-title">
           Unplugged Brewery
         </h1>
+        
         {/* Tagline */}
         <p className="text-base sm:text-lg md:text-2xl text-white mb-10 max-w-xl mx-auto font-light tracking-wide relative hero-tagline">
           <span className="bg-brewery-gold/20 px-2 py-1 rounded-md shadow-sm">Crafting unique brews for unplugged moments.</span>
         </p>
-        {/* Navigation Buttons Only (no CTA) */}
+        
+        {/* Navigation Buttons */}
         <div className="flex flex-wrap justify-center gap-6 mt-4 nav-btns-row">
           {navCards.map((card, idx) => (
             <a
@@ -155,7 +199,8 @@ export default function Hero() {
             </a>
           ))}
         </div>
-        {/* Get Unplugged message appears below buttons and is last to fade out */}
+        
+        {/* Get Unplugged message */}
         {showGetUnplugged && (
           <div
             className={`get-unplugged-text transition-opacity duration-700 ease-out text-4xl md:text-5xl font-bold drop-shadow-lg mt-10 mb-8
@@ -168,6 +213,7 @@ export default function Hero() {
           </div>
         )}
       </div>
+      
       {/* Scroll Indicator */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center scroll-indicator">
         <span className="text-xs mb-1 tracking-widest uppercase opacity-80">Learn More</span>
@@ -175,13 +221,15 @@ export default function Hero() {
           <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
         </svg>
       </div>
-      {/* Full-width Section Divider */}
-      <div className="w-screen left-1/2 -translate-x-1/2 absolute bottom-0 z-10" style={{position:'absolute',left:'50%',transform:'translateX(-50%)',width:'100vw',zIndex:10}} aria-hidden="true">
-        <svg width="100vw" height="32" viewBox="0 0 1440 32" fill="none" xmlns="http://www.w3.org/2000/svg" style={{display:'block',width:'100vw',minWidth:'100vw',maxWidth:'100vw'}}>
+      
+      {/* Fixed Section Divider - no more 100vw issues */}
+      <div className="absolute bottom-0 left-0 right-0 z-10" aria-hidden="true">
+        <svg className="w-full h-8" viewBox="0 0 1440 32" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M0 16C120 32 360 0 720 0C1080 0 1320 32 1440 16V32H0V16Z" fill="#DAA520" fillOpacity="0.12" />
         </svg>
       </div>
-      {/* Animations, CSS Variables, and Custom Font */}
+      
+      {/* Optimized styles */}
       <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@900&display=swap');
         .font-hero {
@@ -214,13 +262,16 @@ export default function Hero() {
           --logo-filter: brightness(1.2) contrast(1.1) saturate(1.1);
           --breathing-scale: 1.04;
           --breathing-shadow: 0 8px 48px #ffe066a0, 0 2px 0 #fff6;
-          --transition: all 3.5s cubic-bezier(0.4,0,0.2,1);
-          --settle-transition: all 0.7s ease-out;
+          --transition: all 0.8s cubic-bezier(0.4,0,0.2,1);
+          --settle-transition: all 0.4s ease-out;
           --scale: 1;
           --opacity: 1;
           --desaturate: 0;
           --animation-speed: 1;
           --get-unplugged-color: #ffe066;
+          /* Optimize for GPU */
+          transform: translateZ(0);
+          will-change: auto;
         }
         .hero-root.unplugged {
           --glow-color: #222;
@@ -267,18 +318,17 @@ export default function Hero() {
         }
         .hero-overlay {
           background: var(--overlay-bg);
-          transition: background 3.5s cubic-bezier(0.4,0,0.2,1);
+          transition: background 0.8s cubic-bezier(0.4,0,0.2,1);
         }
         .hero-gradient {
           background: var(--gradient);
-          transition: background 3.5s cubic-bezier(0.4,0,0.2,1);
+          transition: background 0.8s cubic-bezier(0.4,0,0.2,1);
         }
         .logo-img {
           box-shadow: var(--logo-glow);
           filter: var(--logo-filter) grayscale(var(--desaturate));
           transition: var(--transition), var(--settle-transition);
-          will-change: transform, opacity, filter;
-          transform: scale(var(--scale));
+          transform: scale(var(--scale)) translateZ(0);
           opacity: var(--opacity);
           transition-delay: 0s;
         }
@@ -286,8 +336,7 @@ export default function Hero() {
           text-shadow: var(--title-glow);
           filter: var(--title-filter) grayscale(var(--desaturate));
           transition: var(--transition), var(--settle-transition);
-          will-change: transform, opacity, filter;
-          transform: scale(var(--scale));
+          transform: scale(var(--scale)) translateZ(0);
           opacity: var(--opacity);
           animation: breathing calc(3s * var(--animation-speed)) ease-in-out infinite;
           transition-delay: 0.2s;
@@ -296,18 +345,16 @@ export default function Hero() {
           animation-duration: 6s;
         }
         @keyframes breathing {
-          0%, 100% { transform: scale(1); text-shadow: var(--breathing-shadow); }
-          50% { transform: scale(var(--breathing-scale)); text-shadow: var(--breathing-shadow); }
+          0%, 100% { transform: scale(1) translateZ(0); text-shadow: var(--breathing-shadow); }
+          50% { transform: scale(var(--breathing-scale)) translateZ(0); text-shadow: var(--breathing-shadow); }
         }
         .hero-tagline {
           filter: var(--title-filter) grayscale(var(--desaturate));
           transition: var(--transition), var(--settle-transition);
-          will-change: transform, opacity, filter;
-          transform: scale(var(--scale));
+          transform: scale(var(--scale)) translateZ(0);
           opacity: var(--opacity);
           transition-delay: 0.4s;
         }
-        /* Enhanced Nav Button Lighting Effects */
         .nav-btn {
           background: var(--btn-bg);
           color: var(--btn-text);
@@ -315,10 +362,9 @@ export default function Hero() {
           box-shadow: var(--btn-glow), 0 0 0 0 var(--btn-bg-glow);
           filter: var(--title-filter) grayscale(var(--desaturate));
           transition: var(--transition), var(--settle-transition);
-          will-change: transform, opacity, filter, box-shadow, background;
           border-radius: 1rem;
           padding: 1.5rem 2rem;
-          transform: scale(var(--scale));
+          transform: scale(var(--scale)) translateZ(0);
           opacity: var(--opacity);
           transition-delay: 0.7s;
           position: relative;
@@ -362,15 +408,15 @@ export default function Hero() {
         }
         .foam-bubbles {
           opacity: var(--foam-opacity);
-          transition: opacity 3.5s cubic-bezier(0.4,0,0.2,1);
+          transition: opacity 0.8s cubic-bezier(0.4,0,0.2,1);
         }
         .scroll-indicator svg {
           color: var(--scroll-indicator);
-          transition: color 3.5s cubic-bezier(0.4,0,0.2,1);
+          transition: color 0.8s cubic-bezier(0.4,0,0.2,1);
         }
         .scroll-indicator span {
           color: var(--scroll-indicator);
-          transition: color 3.5s cubic-bezier(0.4,0,0.2,1);
+          transition: color 0.8s cubic-bezier(0.4,0,0.2,1);
         }
         .hero-root .animate-bounce {
           animation: bounce calc(1.5s * var(--animation-speed)) infinite;
@@ -386,27 +432,12 @@ export default function Hero() {
           filter: brightness(0.3) grayscale(0.8) saturate(0.2);
           transition: filter 0.7s cubic-bezier(0.4,0,0.2,1);
         }
-        .hero-root.lit .logo-img,
-        .hero-root.lit .hero-title,
-        .hero-root.lit .hero-tagline,
-        .hero-root.lit .nav-btn,
-        .hero-root.lit .foam-bubbles,
-        .hero-root.lit .scroll-indicator {
-          filter: none;
-        }
-        .hero-root.dark .logo-img,
-        .hero-root.dark .hero-title,
-        .hero-root.dark .hero-tagline,
-        .hero-root.dark .nav-btn,
-        .hero-root.dark .foam-bubbles,
-        .hero-root.dark .scroll-indicator {
-          filter: brightness(0.3) grayscale(0.8) saturate(0.2) !important;
-        }
         .get-unplugged-text {
           z-index: 60;
           position: relative;
           text-shadow: 0 0 32px #ffe066, 0 0 8px #fffbe6, 0 0 2px #fffbe6;
           transition: opacity 0.7s, color 0.7s, text-shadow 0.7s;
+          transform: translateZ(0);
         }
         .get-unplugged-text.glow-bright {
           color: #ffe066;
@@ -439,4 +470,4 @@ export default function Hero() {
       `}</style>
     </section>
   );
-} 
+}

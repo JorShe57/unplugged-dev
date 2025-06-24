@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { Beer as BeerIcon, Hop, Award, GlassWater, Star } from 'lucide-react';
 import { useInView } from 'react-intersection-observer';
 
@@ -27,7 +27,49 @@ export default function BeerMenu() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showAvailable, setShowAvailable] = useState(true);
-  const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.15 });
+  const [isVisible, setIsVisible] = useState(false);
+  const [imagesLoaded, setImagesLoaded] = useState<{ [key: string]: boolean }>({});
+  const sectionRef = useRef<HTMLElement>(null);
+
+  // Mobile detection
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth <= 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Intersection observer with mobile-friendly settings
+  const { ref, inView } = useInView({ 
+    triggerOnce: true, 
+    threshold: 0.1,
+    rootMargin: '50px 0px',
+  });
+
+  // Mobile fallback timer
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (!isVisible && isMobile) {
+        setIsVisible(true);
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [isVisible, isMobile]);
+
+  // Update visibility
+  useEffect(() => {
+    if (inView || isVisible) {
+      setIsVisible(true);
+    }
+  }, [inView, isVisible]);
+
+  // Combine refs
+  const combinedRef = useCallback((el: HTMLElement | null) => {
+    ref(el);
+    sectionRef.current = el;
+  }, [ref]);
 
   useEffect(() => {
     async function fetchBeers() {
@@ -50,6 +92,30 @@ export default function BeerMenu() {
     fetchBeers();
   }, []);
 
+  // Preload beer images
+  useEffect(() => {
+    if (beers.length === 0) return;
+
+    const imagePromises = beers
+      .filter(beer => beer.image?.asset?.url)
+      .map((beer) => {
+        return new Promise<void>((resolve) => {
+          const image = new Image();
+          image.onload = () => {
+            setImagesLoaded(prev => ({ ...prev, [beer._id]: true }));
+            resolve();
+          };
+          image.onerror = () => {
+            setImagesLoaded(prev => ({ ...prev, [beer._id]: false }));
+            resolve();
+          };
+          image.src = beer.image!.asset.url;
+        });
+      });
+
+    Promise.all(imagePromises);
+  }, [beers]);
+
   const filteredBeers = showAvailable ? beers.filter((b) => b.available) : beers;
 
   // Helper: pick icon based on beer type
@@ -63,8 +129,8 @@ export default function BeerMenu() {
     return (
       <section
         id="menu"
-        ref={ref}
-        className={`beer-menu-section ${inView ? 'animate-fade-in-up' : 'opacity-0 translate-y-10'}`}
+        ref={combinedRef}
+        className={`beer-menu-section scroll-animate ${isVisible ? 'in-view' : ''}`}
       >
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="section-title">
@@ -85,8 +151,8 @@ export default function BeerMenu() {
     return (
       <section
         id="menu"
-        ref={ref}
-        className={`beer-menu-section ${inView ? 'animate-fade-in-up' : 'opacity-0 translate-y-10'}`}
+        ref={combinedRef}
+        className={`beer-menu-section scroll-animate ${isVisible ? 'in-view' : ''}`}
       >
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="section-title">
@@ -103,8 +169,8 @@ export default function BeerMenu() {
   return (
     <section
       id="menu"
-      ref={ref}
-      className={`beer-menu-section ${inView ? 'animate-fade-in-up' : 'opacity-0 translate-y-10'}`}
+      ref={combinedRef}
+      className={`beer-menu-section scroll-animate ${isVisible ? 'in-view' : ''}`}
     >
       {/* Section Divider */}
       <div className="section-divider">
@@ -115,16 +181,17 @@ export default function BeerMenu() {
 
       <div className="max-w-6xl mx-auto px-4 py-16">
         {/* Header */}
-        <div className="header-container">
+        <div className="header-container scroll-animate">
           <h2 className="section-title">
             <Hop className="w-10 h-10 text-brewery-gold animate-float" />
             Our Beers
             <BeerIcon className="w-10 h-10 text-brewery-gold animate-float-delay" />
           </h2>
           <button
-            className="filter-btn"
+            className="filter-btn touch-target"
             onClick={() => setShowAvailable((v) => !v)}
             aria-pressed={showAvailable}
+            type="button"
           >
             <Hop className="w-5 h-5" />
             {showAvailable ? 'Show All Beers' : 'Show Available Only'}
@@ -132,24 +199,43 @@ export default function BeerMenu() {
         </div>
 
         {/* Beer List */}
-        <div className="beer-list">
+        <div className="beer-list scroll-animate">
           {filteredBeers.length === 0 ? (
             <div className="no-beers">No beers found.</div>
           ) : (
             filteredBeers.map((beer, idx) => (
               <div
                 key={beer._id}
-                className={`beer-item ${!beer.available ? 'unavailable' : ''} ${beer.featured ? 'featured' : ''}`}
+                className={`beer-item mobile-optimized ${!beer.available ? 'unavailable' : ''} ${beer.featured ? 'featured' : ''}`}
                 style={{ animationDelay: `${idx * 100}ms` }}
               >
                 {/* Beer Image */}
                 {beer.image?.asset?.url && (
                   <div className="beer-image">
-                    <img
-                      src={beer.image.asset.url}
-                      alt={beer.name}
-                      className="beer-img"
-                    />
+                    {imagesLoaded[beer._id] === true ? (
+                      <img
+                        src={beer.image.asset.url}
+                        alt={beer.name}
+                        className="beer-img"
+                        loading="lazy"
+                        onLoad={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.style.opacity = '1';
+                        }}
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                        }}
+                      />
+                    ) : imagesLoaded[beer._id] === false ? (
+                      <div className="image-fallback">
+                        <BeerIcon className="w-8 h-8 text-brewery-gold" />
+                      </div>
+                    ) : (
+                      <div className="image-loading">
+                        <BeerIcon className="w-8 h-8 text-brewery-gold animate-pulse" />
+                      </div>
+                    )}
                   </div>
                 )}
 
@@ -217,6 +303,7 @@ export default function BeerMenu() {
           align-items: center;
           gap: 2rem;
           margin-bottom: 3rem;
+          transition-delay: 0.1s;
         }
 
         @media (min-width: 768px) {
@@ -228,7 +315,7 @@ export default function BeerMenu() {
 
         .section-title {
           font-family: 'Montserrat', sans-serif;
-          font-size: clamp(2.5rem, 6vw, 4rem);
+          font-size: clamp(2rem, 6vw, 4rem);
           font-weight: 900;
           color: #DAA520;
           text-shadow: 0 2px 24px #8B4513cc, 0 1px 0 #fff3;
@@ -247,7 +334,7 @@ export default function BeerMenu() {
           background: linear-gradient(135deg, #DAA520 0%, #ffe066 100%);
           color: #1a1a1a;
           border: none;
-          padding: 0.75rem 1.5rem;
+          padding: 1rem 2rem;
           border-radius: 2rem;
           font-family: 'Oswald', sans-serif;
           font-weight: 600;
@@ -267,6 +354,7 @@ export default function BeerMenu() {
           display: flex;
           flex-direction: column;
           gap: 1.5rem;
+          transition-delay: 0.2s;
         }
 
         .beer-item {
@@ -277,13 +365,12 @@ export default function BeerMenu() {
           box-shadow: 0 4px 24px rgba(139, 69, 19, 0.3);
           border: 2px solid transparent;
           transition: all 0.3s ease;
-          opacity: 0;
           animation: slideInUp 0.6s ease forwards;
           color: #1a1a1a;
         }
 
         .beer-item:hover {
-          transform: translateY(-4px);
+          transform: translateY(-4px) translateZ(0);
           box-shadow: 0 8px 32px rgba(139, 69, 19, 0.4);
           border-color: #DAA520;
         }
@@ -315,6 +402,22 @@ export default function BeerMenu() {
           width: 100%;
           height: 100%;
           object-fit: contain;
+          opacity: 0;
+          transition: opacity 0.3s ease;
+          -webkit-transform: translateZ(0);
+          transform: translateZ(0);
+          -webkit-backface-visibility: hidden;
+          backface-visibility: hidden;
+        }
+
+        .image-fallback,
+        .image-loading {
+          width: 100%;
+          height: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: rgba(218, 165, 32, 0.1);
         }
 
         .beer-info {
@@ -436,40 +539,6 @@ export default function BeerMenu() {
           padding: 3rem;
         }
 
-        /* Animations */
-        @keyframes slideInUp {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-
-        .animate-fade-in-up {
-          animation: slideInUp 0.8s ease forwards;
-        }
-
-        .animate-float {
-          animation: float 3s ease-in-out infinite;
-        }
-
-        .animate-float-delay {
-          animation: float 3s ease-in-out infinite 1.5s;
-        }
-
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-10px); }
-        }
-
         /* Mobile responsive */
         @media (max-width: 768px) {
           .beer-item {
@@ -496,17 +565,38 @@ export default function BeerMenu() {
           }
 
           .spec-item {
-            font-size: 0.8rem;
+            font-size: 0.9rem;
+          }
+
+          .beer-price {
+            font-size: 1.75rem;
+          }
+
+          .section-title {
+            font-size: clamp(1.5rem, 8vw, 2.5rem);
+          }
+
+          .filter-btn {
+            padding: 0.875rem 1.75rem;
+            font-size: 0.9rem;
           }
         }
 
-        /* Performance optimizations */
-        @media (prefers-reduced-motion: reduce) {
-          * {
-            animation-duration: 0.01ms !important;
-            animation-iteration-count: 1 !important;
-            transition-duration: 0.01ms !important;
+        /* Animations */
+        @keyframes slideInUp {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
           }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
         }
       `}</style>
     </section>

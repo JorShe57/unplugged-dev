@@ -23,6 +23,11 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
   
+  /* Brewery colors */
+  --color-brewery-dark: var(--brewery-dark);
+  --color-brewery-primary: var(--brewery-primary);
+  --color-brewery-gold: var(--brewery-gold);
+  
   /* Chart colors */
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
@@ -54,6 +59,11 @@
 /* Root variables - Light theme */
 :root {
   --radius: 0.625rem;
+  
+  /* Brewery colors */
+  --brewery-dark: #2c1810;
+  --brewery-primary: #8b4513;
+  --brewery-gold: #d4af37;
   
   /* Base colors */
   --background: oklch(1 0 0);
@@ -105,6 +115,11 @@
 
 /* Dark theme overrides */
 .dark {
+  /* Brewery colors for dark mode */
+  --brewery-dark: #1a0f08;
+  --brewery-primary: #cd853f;
+  --brewery-gold: #ffd700;
+  
   /* Base colors */
   --background: oklch(0.147 0.004 49.25);
   --foreground: oklch(0.985 0.001 106.423);
@@ -164,7 +179,11 @@
   }
 }
 
-/* Layout and scrolling styles - FIXED */
+/* ========================================
+   UNIVERSAL MOBILE OPTIMIZATIONS
+   ======================================== */
+
+/* Layout and scrolling styles - iPhone optimized */
 html,
 body {
   max-width: 100%;
@@ -172,13 +191,144 @@ body {
 }
 
 html {
-  /* Removed conflicting scroll-behavior: smooth */
   scroll-padding-top: 80px;
+  /* Better font rendering on iOS */
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Enable momentum scrolling on iOS */
 body {
   -webkit-overflow-scrolling: touch;
+  /* Prevent zoom on input focus (iOS) */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Universal mobile-first animations */
+.mobile-fade-in {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+@media (min-width: 769px) {
+  .mobile-fade-in {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  
+  .mobile-fade-in.in-view {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Universal touch targets */
+.touch-target {
+  min-height: 48px;
+  min-width: 44px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.touch-target:active {
+  transform: translateY(0);
+  transition-duration: 0.1s;
+}
+
+/* Universal image optimizations */
+.mobile-optimized-img {
+  max-width: 100%;
+  height: auto;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+/* iPhone specific fixes */
+@supports (-webkit-touch-callout: none) {
+  /* iOS Safari specific styles */
+  
+  /* Fix viewport issues */
+  body {
+    position: relative;
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+  }
+  
+  /* Improve image rendering */
+  img,
+  .mobile-optimized-img {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+  
+  /* Fix backdrop-blur on iOS */
+  .backdrop-blur-md,
+  .backdrop-blur-sm {
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+  }
+  
+  /* Ensure hardware acceleration */
+  .rounded-3xl,
+  .shadow-2xl,
+  .transition-opacity,
+  .mobile-optimized {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+  
+  /* Force brewery color visibility on iOS */
+  .text-brewery-primary {
+    color: #8b4513 !important;
+  }
+  
+  .text-brewery-gold {
+    color: #d4af37 !important;
+  }
+  
+  .text-brewery-dark {
+    color: #2c1810 !important;
+  }
+  
+  .border-brewery-gold {
+    border-color: #d4af37 !important;
+  }
+  
+  .bg-brewery-gold {
+    background-color: #d4af37 !important;
+  }
+  
+  /* Dark mode brewery colors for iOS */
+  .dark .text-brewery-primary {
+    color: #cd853f !important;
+  }
+  
+  .dark .text-brewery-gold {
+    color: #ffd700 !important;
+  }
+  
+  .dark .text-brewery-dark {
+    color: #1a0f08 !important;
+  }
+  
+  .dark .border-brewery-gold {
+    border-color: #ffd700 !important;
+  }
+  
+  .dark .bg-brewery-gold {
+    background-color: #ffd700 !important;
+  }
 }
 
 /* Component styles */
@@ -190,10 +340,32 @@ body {
   pointer-events: none;
 }
 
+/* Universal animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-float-delay {
+  animation: float 3s 1.5s ease-in-out infinite;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .section-divider-hero-menu svg {
     height: 36px !important;
+  }
+  
+  /* iPhone specific font size adjustments */
+  @supports (-webkit-touch-callout: none) {
+    /* Ensure text doesn't disappear on iOS */
+    h1, h2, h3, h4, h5, h6 {
+      -webkit-text-size-adjust: none;
+    }
   }
 }
 
@@ -210,4 +382,23 @@ body {
 * {
   -webkit-transform: translateZ(0);
   transform: translateZ(0);
+}
+
+/* Image loading optimization for iOS */
+img {
+  max-width: 100%;
+  height: auto;
+  /* Prevent image flash on load */
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+/* Loading state for images */
+img[loading="lazy"] {
+  opacity: 0;
+}
+
+img[loading="lazy"].loaded,
+img:not([loading="lazy"]) {
+  opacity: 1;
 }

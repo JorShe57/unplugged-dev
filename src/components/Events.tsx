@@ -1,53 +1,12 @@
 'use client';
-import React, { useEffect, useState, useCallback, useRef } from 'react';
+import React from 'react';
 import { Hop, Beer, GlassWater, Calendar, MapPin, Star, Clock } from 'lucide-react';
 import { useInView } from 'react-intersection-observer';
 import { useUpcomingEvents } from '@/hooks/useEvents';
 
 export default function Events() {
   const { events, loading, error } = useUpcomingEvents();
-  const [isVisible, setIsVisible] = useState(false);
-  const sectionRef = useRef<HTMLElement>(null);
-
-  // Mobile detection
-  const [isMobile, setIsMobile] = useState(false);
-  
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth <= 768);
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
-  // Intersection observer with mobile-friendly settings
-  const { ref, inView } = useInView({ 
-    triggerOnce: true, 
-    threshold: 0.1,
-    rootMargin: '50px 0px',
-  });
-
-  // Mobile fallback timer
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (!isVisible && isMobile) {
-        setIsVisible(true);
-      }
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [isVisible, isMobile]);
-
-  // Update visibility
-  useEffect(() => {
-    if (inView || isVisible) {
-      setIsVisible(true);
-    }
-  }, [inView, isVisible]);
-
-  // Combine refs
-  const combinedRef = useCallback((el: HTMLElement | null) => {
-    ref(el);
-    sectionRef.current = el;
-  }, [ref]);
+  const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.15 });
 
   // Helper function to format date
   const formatEventDate = (dateString: string) => {
@@ -74,8 +33,8 @@ export default function Events() {
   return (
     <section
       id="events"
-      ref={combinedRef}
-      className={`relative py-20 px-2 md:px-0 bg-brewery-dark text-white overflow-hidden premium-bg scroll-animate ${isVisible ? 'in-view' : ''}`}
+      ref={ref}
+      className={`relative py-20 px-2 md:px-0 bg-brewery-dark text-white overflow-hidden premium-bg ${inView ? 'animate-fade-in-up' : 'opacity-0 translate-y-10'}`}
       style={{
         background:
           'radial-gradient(ellipse at 60% 40%, #DAA52033 0%, #1F1F1F 80%), url(/events1.png) center/cover no-repeat',
@@ -89,8 +48,8 @@ export default function Events() {
       </div>
 
       {/* Header with icons */}
-      <div className="max-w-4xl mx-auto px-4 flex flex-col items-center mb-10 events-header scroll-animate">
-        <div className="flex items-center gap-4 mb-2">
+      <div className="max-w-4xl mx-auto px-4 flex flex-col items-center mb-10">
+        <div className="flex items-center gap-4 mb-2 animate-fade-in-up">
           <Hop className="w-10 h-10 text-brewery-gold animate-float" />
           <h2 className="text-4xl md:text-5xl font-hero font-extrabold text-brewery-gold drop-shadow-xl tracking-tight text-center flex items-center gap-2">
             Upcoming Events
@@ -98,8 +57,8 @@ export default function Events() {
           </h2>
           <GlassWater className="w-10 h-10 text-brewery-gold animate-float" />
         </div>
-        <div className="w-24 h-2 bg-gradient-to-r from-brewery-gold/80 via-brewery-primary/80 to-brewery-gold/80 rounded-full my-4" />
-        <p className="text-lg md:text-xl text-brewery-gold text-center font-light max-w-2xl">
+        <div className="w-24 h-2 bg-gradient-to-r from-brewery-gold/80 via-brewery-primary/80 to-brewery-gold/80 rounded-full my-4 animate-fade-in-up" />
+        <p className="text-lg md:text-xl text-brewery-gold text-center font-light max-w-2xl animate-fade-in-up delay-200">
           Join us for unforgettable brewery experiences! Check out our upcoming events below.
         </p>
       </div>
@@ -110,10 +69,16 @@ export default function Events() {
       <GlassWater className="absolute left-10 bottom-16 w-14 h-14 text-brewery-gold opacity-20 animate-float z-0" aria-hidden="true" />
 
       {/* Events Container */}
-      <div className="relative z-10 max-w-5xl mx-auto w-full flex flex-col items-center justify-center bg-brewery-gold rounded-3xl shadow-2xl border-4 border-brewery-gold overflow-hidden premium-iframe-frame events-container scroll-animate p-4 sm:p-8">
+      <div
+        className="relative z-10 max-w-5xl mx-auto w-full flex flex-col items-center justify-center bg-brewery-gold rounded-3xl shadow-2xl border-4 border-brewery-gold overflow-hidden premium-iframe-frame animate-fade-in-up p-4 sm:p-8"
+        style={{
+          boxShadow: '0 8px 32px 0 #0008, 0 1.5px 0 #DAA520',
+          borderRadius: '2rem',
+        }}
+      >
         {/* Loading State */}
         {loading && (
-          <div className="flex flex-col items-center justify-center py-10 sm:py-20 w-full">
+          <div className="flex flex-col items-center justify-center py-10 sm:py-20 w-full animate-fade-in-up">
             <div className="brewery-loader mb-4">
               <span className="foam-bubble" />
               <span className="foam-bubble" />
@@ -125,7 +90,7 @@ export default function Events() {
 
         {/* Error State */}
         {error && (
-          <div className="flex flex-col items-center justify-center py-6 sm:py-12 w-full">
+          <div className="flex flex-col items-center justify-center py-6 sm:py-12 w-full animate-fade-in-up">
             <span className="text-brewery-gold text-base sm:text-xl font-bold mb-2">Unable to load events.</span>
             <span className="text-brewery-gold text-sm sm:text-lg mb-4 text-center">Please check back later for our latest events!</span>
           </div>
@@ -133,9 +98,9 @@ export default function Events() {
 
         {/* Events List */}
         {!loading && !error && (
-          <div className="w-full events-list scroll-animate">
+          <div className="w-full">
             {events.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-6 sm:py-12 w-full">
+              <div className="flex flex-col items-center justify-center py-6 sm:py-12 w-full animate-fade-in-up">
                 <Calendar className="w-16 h-16 text-brewery-gold mb-4 opacity-60" />
                 <span className="text-brewery-gold text-base sm:text-xl font-bold mb-2">No upcoming events</span>
                 <span className="text-brewery-gold text-sm sm:text-lg text-center">Check back soon for exciting brewery events!</span>
@@ -145,7 +110,7 @@ export default function Events() {
                 {events.map((event, idx) => (
                   <div
                     key={event._id}
-                    className={`event-card mobile-optimized ${event.featured ? 'featured' : ''}`}
+                    className={`event-card ${event.featured ? 'featured' : ''}`}
                     style={{ animationDelay: `${idx * 100}ms` }}
                   >
                     {/* Event Image */}
@@ -154,8 +119,7 @@ export default function Events() {
                         <img
                           src={event.image.asset.url}
                           alt={event.title}
-                          className="event-img mobile-optimized-img"
-                          loading="lazy"
+                          className="event-img"
                         />
                       </div>
                     )}
@@ -203,25 +167,12 @@ export default function Events() {
         </svg>
       </div>
 
-      {/* Component-specific styles */}
+      {/* Animations and premium styles */}
       <style jsx>{`
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&family=Oswald:wght@400;600;700&display=swap');
 
         .font-hero {
           font-family: 'Montserrat', 'Oswald', 'Bebas Neue', Arial, sans-serif;
-        }
-
-        /* Component-specific timing */
-        .events-header {
-          transition-delay: 0.1s;
-        }
-        
-        .events-container {
-          transition-delay: 0.2s;
-        }
-        
-        .events-list {
-          transition-delay: 0.3s;
         }
 
         .premium-bg::before {
@@ -235,7 +186,6 @@ export default function Events() {
 
         .premium-iframe-frame {
           background: linear-gradient(135deg, rgba(255, 251, 230, 0.95) 0%, rgba(255, 224, 102, 0.9) 100%);
-          box-shadow: 0 8px 32px 0 #0008, 0 1.5px 0 #DAA520;
         }
 
         .brewery-loader {
@@ -282,7 +232,7 @@ export default function Events() {
         }
 
         .event-card:hover {
-          transform: translateY(-4px) translateZ(0);
+          transform: translateY(-4px);
           box-shadow: 0 8px 32px rgba(218, 165, 32, 0.4);
           border-color: #DAA520;
         }
@@ -383,6 +333,25 @@ export default function Events() {
           }
         }
 
+        .animate-fade-in-up {
+          animation: slideInUp 0.8s ease forwards;
+        }
+
+        .animate-float {
+          animation: float 3s ease-in-out infinite;
+        }
+
+        .animate-float-delay {
+          animation: float 3s ease-in-out infinite 1.5s;
+        }
+
+        @keyframes float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-10px); }
+        }
+
+        .delay-200 { animation-delay: 0.2s; }
+
         /* Mobile responsive */
         @media (max-width: 768px) {
           .event-card {
@@ -425,6 +394,15 @@ export default function Events() {
 
           .detail-row {
             font-size: 0.85rem;
+          }
+        }
+
+        /* Performance optimizations */
+        @media (prefers-reduced-motion: reduce) {
+          * {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
           }
         }
       `}</style>

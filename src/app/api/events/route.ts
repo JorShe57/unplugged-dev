@@ -1,4 +1,4 @@
-import { sanityClient } from '@/lib/sanity'
+import { sanityClient, urlFor } from '@/lib/sanity'
 
 export async function GET() {
   try {
@@ -11,10 +11,21 @@ export async function GET() {
         location,
         featured,
         active,
-        image { asset->{url} }
+        image
       }
     `)
-    return Response.json(events)
+    
+    // Process images with proper URL formatting
+    const processedEvents = events.map((event: any) => ({
+      ...event,
+      image: event.image ? {
+        asset: {
+          url: urlFor(event.image).url()
+        }
+      } : null
+    }))
+    
+    return Response.json(processedEvents)
   } catch (error) {
     console.error('Error fetching events:', error)
     return Response.json({ error: 'Failed to fetch events' }, { status: 500 })

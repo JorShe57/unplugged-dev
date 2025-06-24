@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { sanityClient } from '../lib/sanity/client';
+import { sanityClient } from '../lib/sanity';
 import { Beer as BeerIcon, Hop, Award, GlassWater } from 'lucide-react';
 import { useInView } from 'react-intersection-observer';
 

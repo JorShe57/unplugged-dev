@@ -6,6 +6,7 @@ import { useInView } from 'react-intersection-observer';
 const navLinks = [
   { label: 'Facebook', href: 'https://www.facebook.com/unplugbrew/', external: true },
   { label: 'Leave a Review', href: 'https://g.co/kgs/76LCxnz', external: true },
+  { label: 'Menu', href: '/menu', external: false },
 ];
 
 export default function Header() {

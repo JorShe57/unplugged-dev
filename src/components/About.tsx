@@ -18,10 +18,7 @@ const galleryImages = [
 ];
 
 export default function About() {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isFading, setIsFading] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
-  const [imagesLoaded, setImagesLoaded] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
 
   // Mobile detection
@@ -58,37 +55,6 @@ export default function About() {
     }
   }, [inView, isVisible]);
 
-  // Preload images
-  useEffect(() => {
-    const imagePromises = galleryImages.map((img) => {
-      return new Promise((resolve, reject) => {
-        const image = new Image();
-        image.onload = resolve;
-        image.onerror = reject;
-        image.src = img.src;
-      });
-    });
-
-    Promise.all(imagePromises)
-      .then(() => setImagesLoaded(true))
-      .catch(() => setImagesLoaded(true));
-  }, []);
-
-  // Image slideshow effect
-  useEffect(() => {
-    if (!imagesLoaded) return;
-
-    const interval = setInterval(() => {
-      setIsFading(true);
-      setTimeout(() => {
-        setCurrentIndex((prevIndex) => (prevIndex + 1) % galleryImages.length);
-        setIsFading(false);
-      }, 400);
-    }, 3500);
-    
-    return () => clearInterval(interval);
-  }, [imagesLoaded]);
-
   // Combine refs
   const combinedRef = useCallback((el: HTMLDivElement | null) => {
     ref(el);
@@ -114,56 +80,30 @@ export default function About() {
         {/* Left: Image & Gallery Preview */}
         <div className="flex-1 flex flex-col items-center justify-center gap-6 about-image-section scroll-animate">
           <div className="relative w-auto h-auto max-w-full max-h-[400px] rounded-3xl overflow-hidden shadow-2xl border-4 border-brewery-gold flex items-center justify-center bg-white/10">
-            {imagesLoaded ? (
-              <img
-                src={galleryImages[currentIndex].src}
-                alt={galleryImages[currentIndex].alt}
-                className={`object-contain max-w-full max-h-[400px] transition-opacity duration-400 ${isFading ? 'opacity-0' : 'opacity-100'}`}
-                key={galleryImages[currentIndex].src}
-                loading="eager"
-                onLoad={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.style.opacity = '1';
-                }}
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.style.display = 'none';
-                  console.log('Image failed to load:', target.src);
-                }}
-              />
-            ) : (
-              <div className="w-full h-[400px] flex items-center justify-center bg-brewery-gold/20">
-                <Beer className="w-16 h-16 text-brewery-gold animate-pulse" />
-              </div>
-            )}
+            <img
+              src={galleryImages[0].src}
+              alt={galleryImages[0].alt}
+              className="object-contain max-w-full max-h-[400px]"
+              loading="eager"
+              style={{ background: '#fff' }}
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.style.display = 'none';
+              }}
+            />
             
             {/* Decorative Icons */}
             <Hop className="absolute top-4 left-4 w-10 h-10 text-brewery-gold opacity-80 animate-float" />
             <Beer className="absolute bottom-4 right-4 w-10 h-10 text-brewery-gold opacity-80 animate-float-delay" />
-            
-            {/* Slideshow indicators */}
-            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2 z-10">
-              {galleryImages.map((img, idx) => (
-                <span
-                  key={img.src}
-                  className={`w-3 h-3 rounded-full border border-brewery-gold bg-white/70 dark:bg-brewery-dark/70 transition-all duration-300 ${idx === currentIndex ? 'bg-brewery-gold scale-110' : ''}`}
-                />
-              ))}
-            </div>
           </div>
         </div>
 
         {/* Right: Content with glass effect */}
-        <div className="flex-1 flex flex-col justify-center gap-8 about-content-section scroll-animate bg-white/60 dark:bg-brewery-dark/60 rounded-3xl shadow-2xl border border-brewery-gold/40 backdrop-blur-md p-8">
+        <div className="flex-1 flex flex-col justify-center gap-8 about-content-section scroll-animate bg-white rounded-3xl shadow-2xl border border-brewery-gold/40 p-8">
           {/* Tagline/Hook */}
-          <h2 className="text-4xl md:text-5xl font-extrabold text-brewery-primary mb-2 leading-tight drop-shadow-lg">
-            Where craft meets character, <span className="text-brewery-gold">unplugged</span> from the ordinary
-          </h2>
-          
-          {/* Quote styling with glass effect */}
-          <blockquote className="text-xl md:text-2xl italic font-light text-brewery-gold border-l-4 border-brewery-gold pl-4 mb-4 bg-white/60 dark:bg-brewery-dark/60 rounded-xl shadow border border-brewery-gold/30 backdrop-blur-sm p-4">
-            "At Unplugged Brewery, we believe the best moments are brewed together."
-          </blockquote>
+          <div className="text-2xl md:text-3xl font-extrabold text-brewery-primary text-center mb-2">
+            Where craft meets character. <br className="hidden md:inline" /> Unplugged from the ordinary.
+          </div>
           
           {/* Stats with glass effect */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-2 bg-white/50 dark:bg-brewery-dark/50 rounded-xl shadow border border-brewery-gold/20 backdrop-blur-sm p-2">
@@ -226,12 +166,6 @@ export default function About() {
         .stat-card:nth-child(2) { transition-delay: 0.4s; }
         .stat-card:nth-child(3) { transition-delay: 0.5s; }
         .stat-card:nth-child(4) { transition-delay: 0.6s; }
-        
-        /* Custom glass morphism for this component */
-        .about-content-section {
-          backdrop-filter: blur(16px);
-          -webkit-backdrop-filter: blur(16px);
-        }
         
         /* Slideshow specific transitions */
         .transition-opacity {

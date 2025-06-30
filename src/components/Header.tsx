@@ -135,10 +135,10 @@ export default function Header() {
           </svg>
         </button>
 
-        {/* Desktop Nav */}
-        <ul className="nav-menu scroll-animate md:flex hidden">
-          {navLinks.map((link) => (
-            <li key={link.href} className="nav-item">
+        {/* Navigation Links */}
+        <ul className={`nav-menu scroll-animate ${open ? 'nav-menu-open' : 'nav-menu-closed'}`}>
+          {navLinks.map((link, idx) => (
+            <li key={link.href} className={`nav-item ${open ? 'nav-item-visible' : 'nav-item-hidden'}`}>
               {link.external ? (
                 <a
                   href={link.href}
@@ -162,40 +162,13 @@ export default function Header() {
           ))}
         </ul>
 
-        {/* Mobile Nav */}
-        {isMobile && open && (
-          <>
-            <ul className="nav-menu nav-menu-open scroll-animate md:hidden flex flex-col w-full absolute left-0 top-full bg-[rgba(44,24,16,0.95)] backdrop-blur-lg z-60">
-              {navLinks.map((link) => (
-                <li key={link.href} className="nav-item">
-                  {link.external ? (
-                    <a
-                      href={link.href}
-                      className="nav-link touch-target mobile-optimized"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={() => setOpen(false)}
-                    >
-                      {link.label}
-                    </a>
-                  ) : (
-                    <a
-                      href={link.href}
-                      className="nav-link touch-target mobile-optimized"
-                      onClick={() => setOpen(false)}
-                    >
-                      {link.label}
-                    </a>
-                  )}
-                </li>
-              ))}
-            </ul>
-            <div 
-              className="mobile-menu-overlay"
-              onClick={() => setOpen(false)}
-              aria-hidden="true"
-            />
-          </>
+        {/* Mobile Menu Overlay */}
+        {open && (
+          <div 
+            className="mobile-menu-overlay"
+            onClick={() => setOpen(false)}
+            aria-hidden="true"
+          />
         )}
       </nav>
 
@@ -310,18 +283,63 @@ export default function Header() {
         /* Mobile menu styles */
         @media (max-width: 768px) {
           .nav-menu {
-            flex-direction: column;
-            width: 100%;
             position: fixed;
-            left: 0;
             top: 100%;
+            left: 0;
+            right: 0;
+            flex-direction: column;
+            gap: 0;
+            width: 100%;
             background: rgba(44, 24, 16, 0.95);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border-top: 1px solid rgba(218, 165, 32, 0.3);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            z-index: 60;
+            max-height: 0;
+            overflow: hidden;
+            z-index: 50;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+          }
+
+          .nav-menu-open {
+            max-height: 300px;
             padding: 1rem 0;
+          }
+
+          .nav-menu-closed {
+            max-height: 0;
+            padding: 0;
+          }
+
+          /* FIXED: Simplified nav item animations */
+          .nav-item {
+            width: 100%;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+          }
+
+          /* Hidden state */
+          .nav-item-hidden {
+            opacity: 0;
+            transform: translateY(-10px);
+            pointer-events: none;
+          }
+
+          /* Visible state - no delays to prevent conflicts */
+          .nav-item-visible {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+          }
+
+          /* Staggered animation using nth-child */
+          .nav-menu-open .nav-item:nth-child(1) { 
+            transition-delay: 0.1s; 
+          }
+          .nav-menu-open .nav-item:nth-child(2) { 
+            transition-delay: 0.15s; 
+          }
+          .nav-menu-open .nav-item:nth-child(3) { 
+            transition-delay: 0.2s; 
           }
 
           .nav-link {

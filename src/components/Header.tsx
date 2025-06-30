@@ -10,7 +10,6 @@ const navLinks = [
 ];
 
 export default function Header() {
-  const [open, setOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
@@ -38,7 +37,7 @@ export default function Header() {
       if (!isVisible && isMobile) {
         setIsVisible(true);
       }
-    }, 200); // Faster for header
+    }, 200);
     return () => clearTimeout(timer);
   }, [isVisible, isMobile]);
 
@@ -66,51 +65,16 @@ export default function Header() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Close mobile menu on resize to desktop
-  useEffect(() => {
-    if (!isMobile && open) {
-      setOpen(false);
-    }
-  }, [isMobile, open]);
-
-  // Close mobile menu when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (open && headerRef.current && !headerRef.current.contains(event.target as Node)) {
-        setOpen(false);
-      }
-    };
-
-    if (open) {
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => document.removeEventListener('mousedown', handleClickOutside);
-    }
-  }, [open]);
-
-  // Prevent body scroll when mobile menu is open
-  useEffect(() => {
-    if (open && isMobile) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [open, isMobile]);
-
   return (
     <header
       ref={combinedRef}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 scroll-animate ${isVisible ? 'in-view' : ''} ${isScrolled ? 'header-scrolled' : 'header-top'} ${open ? 'menu-open' : ''}`}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 scroll-animate ${isVisible ? 'in-view' : ''} ${isScrolled ? 'header-scrolled' : 'header-top'}`}
     >
       <nav className="max-w-7xl mx-auto flex items-center justify-between px-4 py-3 header-nav scroll-animate">
         {/* Logo */}
         <a 
           href="/" 
           className="flex items-center touch-target logo-container mobile-optimized"
-          onClick={() => setOpen(false)}
         >
           <img 
             src="/favicon.webp" 
@@ -119,25 +83,9 @@ export default function Header() {
           />
         </a>
 
-        {/* Mobile Menu Button */}
-        <button
-          className="md:hidden text-brewery-gold focus:outline-none touch-target mobile-menu-btn mobile-optimized"
-          onClick={() => setOpen(!open)}
-          aria-label="Toggle navigation"
-          aria-expanded={open}
-        >
-          <svg className="w-7 h-7 transition-transform duration-200" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-            <path 
-              strokeLinecap="round" 
-              strokeLinejoin="round" 
-              d={open ? 'M6 18L18 6M6 6l12 12' : 'M4 6h16M4 12h16M4 18h16'} 
-            />
-          </svg>
-        </button>
-
-        {/* Navigation Links */}
-        <ul className={`nav-menu scroll-animate ${open ? 'nav-menu-open' : 'nav-menu-closed'}`}>
-          {navLinks.map((link, idx) => (
+        {/* Desktop Navigation Links - Hidden on Mobile */}
+        <ul className="nav-menu scroll-animate hidden md:flex">
+          {navLinks.map((link) => (
             <li key={link.href} className="nav-item">
               {link.external ? (
                 <a
@@ -145,7 +93,6 @@ export default function Header() {
                   className="nav-link touch-target mobile-optimized"
                   target="_blank"
                   rel="noopener noreferrer"
-                  onClick={() => setOpen(false)}
                 >
                   {link.label}
                 </a>
@@ -153,7 +100,6 @@ export default function Header() {
                 <a
                   href={link.href}
                   className="nav-link touch-target mobile-optimized"
-                  onClick={() => setOpen(false)}
                 >
                   {link.label}
                 </a>
@@ -161,15 +107,6 @@ export default function Header() {
             </li>
           ))}
         </ul>
-
-        {/* Mobile Menu Overlay */}
-        {open && (
-          <div 
-            className="mobile-menu-overlay"
-            onClick={() => setOpen(false)}
-            aria-hidden="true"
-          />
-        )}
       </nav>
 
       {/* Component-specific styles */}
@@ -181,10 +118,6 @@ export default function Header() {
         
         .logo-container {
           transition-delay: 0.2s;
-        }
-        
-        .mobile-menu-btn {
-          transition-delay: 0.3s;
         }
 
         /* Header states */
@@ -214,25 +147,7 @@ export default function Header() {
           filter: drop-shadow(0 0 12px rgba(218, 165, 32, 0.8));
         }
 
-        /* Mobile menu button */
-        .mobile-menu-btn {
-          border-radius: 0.5rem;
-          padding: 0.5rem;
-          background: rgba(218, 165, 32, 0.1);
-          border: 1px solid rgba(218, 165, 32, 0.3);
-          transition: all 0.2s ease;
-        }
-
-        .mobile-menu-btn:hover {
-          background: rgba(218, 165, 32, 0.2);
-          border-color: rgba(218, 165, 32, 0.5);
-        }
-
-        .mobile-menu-btn:active {
-          transform: scale(0.95);
-        }
-
-        /* Navigation menu */
+        /* Navigation menu - Desktop only */
         .nav-menu {
           display: flex;
           flex-direction: row;
@@ -280,94 +195,6 @@ export default function Header() {
           box-shadow: 0 4px 12px rgba(218, 165, 32, 0.3);
         }
 
-        /* Mobile menu styles */
-        @media (max-width: 768px) {
-          .nav-menu {
-            position: fixed;
-            top: 76px;
-            left: 0;
-            right: 0;
-            flex-direction: column;
-            gap: 0;
-            width: 100%;
-            background: rgba(44, 24, 16, 0.98);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border-top: 1px solid rgba(218, 165, 32, 0.3);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            z-index: 60;
-            transform: translateY(-100%);
-            transition: transform 0.3s ease;
-            padding: 1rem 0;
-          }
-
-          .nav-menu-open {
-            transform: translateY(0);
-          }
-
-          .nav-menu-closed {
-            transform: translateY(-100%);
-          }
-
-          /* FIXED: Simplified nav item animations */
-          .nav-item {
-            width: 100%;
-            opacity: 1;
-            transform: translateY(0);
-            transition: opacity 0.3s ease, transform 0.3s ease;
-          }
-
-          /* Staggered animation using nth-child - only when menu is opening */
-          .nav-menu-open .nav-item:nth-child(1) { 
-            transition-delay: 0.1s; 
-          }
-          .nav-menu-open .nav-item:nth-child(2) { 
-            transition-delay: 0.15s; 
-          }
-          .nav-menu-open .nav-item:nth-child(3) { 
-            transition-delay: 0.2s; 
-          }
-
-          .nav-link {
-            padding: 1rem 2rem;
-            border-radius: 0;
-            font-size: 1.1rem;
-            border-bottom: 1px solid rgba(218, 165, 32, 0.1);
-          }
-
-          .nav-link:last-child {
-            border-bottom: none;
-          }
-
-          .nav-link::before {
-            border-radius: 0;
-          }
-
-          .nav-link:hover {
-            background: rgba(218, 165, 32, 0.1);
-            transform: none;
-            box-shadow: none;
-          }
-
-          /* Mobile menu overlay */
-          .mobile-menu-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.3);
-            z-index: 40;
-            backdrop-filter: blur(2px);
-            -webkit-backdrop-filter: blur(2px);
-          }
-
-          /* Prevent menu from extending beyond viewport */
-          .menu-open {
-            overflow: hidden;
-          }
-        }
-
         /* Dark mode adjustments */
         .dark .header-top {
           background: rgba(26, 15, 8, 0.8);
@@ -379,33 +206,18 @@ export default function Header() {
           border-bottom-color: rgba(218, 165, 32, 0.3);
         }
 
-        .dark .nav-menu {
-          background: rgba(26, 15, 8, 0.98);
-        }
-
-        .dark .mobile-menu-btn {
-          background: rgba(218, 165, 32, 0.15);
-          border-color: rgba(218, 165, 32, 0.3);
-        }
-
-        .dark .mobile-menu-btn:hover {
-          background: rgba(218, 165, 32, 0.25);
-        }
-
         /* Accessibility improvements */
         @media (prefers-reduced-motion: reduce) {
           .nav-menu,
           .nav-item,
           .nav-link,
-          .mobile-menu-btn,
           .header-logo {
             transition-duration: 0.1s !important;
           }
         }
 
         /* Focus states for accessibility */
-        .nav-link:focus,
-        .mobile-menu-btn:focus {
+        .nav-link:focus {
           outline: 2px solid #d4af37;
           outline-offset: 2px;
         }

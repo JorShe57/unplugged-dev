@@ -138,7 +138,7 @@ export default function Header() {
         {/* Navigation Links */}
         <ul className={`nav-menu scroll-animate ${open ? 'nav-menu-open' : 'nav-menu-closed'}`}>
           {navLinks.map((link, idx) => (
-            <li key={link.href} className={`nav-item ${open ? 'nav-item-visible' : 'nav-item-hidden'}`}>
+            <li key={link.href} className="nav-item">
               {link.external ? (
                 <a
                   href={link.href}
@@ -284,54 +284,40 @@ export default function Header() {
         @media (max-width: 768px) {
           .nav-menu {
             position: fixed;
-            top: 100%;
+            top: 76px;
             left: 0;
             right: 0;
             flex-direction: column;
             gap: 0;
             width: 100%;
-            background: rgba(44, 24, 16, 0.95);
+            background: rgba(44, 24, 16, 0.98);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border-top: 1px solid rgba(218, 165, 32, 0.3);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            max-height: 0;
-            overflow: hidden;
             z-index: 60;
-            transition: max-height 0.3s ease, padding 0.3s ease;
-          }
-
-          .nav-menu-open {
-            max-height: 300px;
+            transform: translateY(-100%);
+            transition: transform 0.3s ease;
             padding: 1rem 0;
           }
 
+          .nav-menu-open {
+            transform: translateY(0);
+          }
+
           .nav-menu-closed {
-            max-height: 0;
-            padding: 0;
+            transform: translateY(-100%);
           }
 
           /* FIXED: Simplified nav item animations */
           .nav-item {
             width: 100%;
+            opacity: 1;
+            transform: translateY(0);
             transition: opacity 0.3s ease, transform 0.3s ease;
           }
 
-          /* Hidden state */
-          .nav-item-hidden {
-            opacity: 0;
-            transform: translateY(-10px);
-            pointer-events: none;
-          }
-
-          /* Visible state - no delays to prevent conflicts */
-          .nav-item-visible {
-            opacity: 1;
-            transform: translateY(0);
-            pointer-events: auto;
-          }
-
-          /* Staggered animation using nth-child */
+          /* Staggered animation using nth-child - only when menu is opening */
           .nav-menu-open .nav-item:nth-child(1) { 
             transition-delay: 0.1s; 
           }
@@ -394,7 +380,7 @@ export default function Header() {
         }
 
         .dark .nav-menu {
-          background: rgba(26, 15, 8, 0.95);
+          background: rgba(26, 15, 8, 0.98);
         }
 
         .dark .mobile-menu-btn {

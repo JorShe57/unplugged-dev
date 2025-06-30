@@ -44,20 +44,20 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL("https://unplugbrew.com"),
+  metadataBase: new URL("https://www.unpluggedelyria.com"),
   alternates: {
     canonical: "/",
   },
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://unplugbrew.com",
+    url: "https://www.unpluggedelyria.com",
     title: "Unplugged Brewing Co. | Craft Beer in Elyria, OH",
     description: "Garage-style microbrewery offering craft lagers, IPAs, stouts and live music. Come relax, drink beer, and unplug with us!",
     siteName: "Unplugged Brewing Company",
     images: [
       {
-        url: "/og-image.jpg", // You'll need to add this image
+        url: "favicon.webp", // You'll need to add this image
         width: 1200,
         height: 630,
         alt: "Unplugged Brewing Company - Craft Beer in Elyria, OH",
@@ -68,7 +68,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Unplugged Brewing Co. | Craft Beer in Elyria, OH",
     description: "Garage-style microbrewery offering craft lagers, IPAs, stouts and live music. Relax, drink beer, and unplug!",
-    images: ["/og-image.jpg"], // Same image as OG
+    images: ["favicon.webp"], // Same image as OG
     creator: "@unpluggedbrew", // Add if you have a Twitter handle
   },
   robots: {
@@ -97,9 +97,9 @@ const structuredData = {
   name: "Unplugged Brewing Company",
   alternateName: "Unplugged Brewing Co.",
   description: "Garage-style microbrewery in Elyria, OH offering craft lagers, IPAs, stouts, live music, and community events. Relax. Drink Beer.",
-  url: "https://unplugbrew.com",
+  url: "https://www.unpluggedelyria.com",
   logo: "favicon.webp", // Add your logo URL
-  image: "https://unplugbrew.com/og-image.jpg",
+  image: "https://www.unpluggedelyria.com/favicon.webp",
   address: {
     "@type": "PostalAddress",
     streetAddress: "201 E Bridge St",
@@ -140,7 +140,7 @@ const structuredData = {
     "Family friendly"
   ],
   servesCuisine: "Beer",
-  hasMenu: "https://unplugbrew.com/menu", // Will be your beer menu page
+  hasMenu: "https://www.unpluggedelyria.com/menu", // Will be your beer menu page
   event: "Live music, cigars & BBQ nights",
   slogan: "Relax. Drink Beer.",
   geo: {

@@ -297,7 +297,7 @@ export default function Header() {
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
             max-height: 0;
             overflow: hidden;
-            z-index: 50;
+            z-index: 60;
             transition: max-height 0.3s ease, padding 0.3s ease;
           }
 

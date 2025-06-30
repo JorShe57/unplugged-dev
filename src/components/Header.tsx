@@ -138,7 +138,7 @@ export default function Header() {
         {/* Navigation Links */}
         <ul className={`nav-menu scroll-animate ${open ? 'nav-menu-open' : 'nav-menu-closed'}`}>
           {navLinks.map((link, idx) => (
-            <li key={link.href} className="nav-item scroll-animate" style={{ transitionDelay: `${0.1 + idx * 0.1}s` }}>
+            <li key={link.href} className={`nav-item ${open ? 'nav-item-visible' : 'nav-item-hidden'}`}>
               {link.external ? (
                 <a
                   href={link.href}
@@ -185,10 +185,6 @@ export default function Header() {
         
         .mobile-menu-btn {
           transition-delay: 0.3s;
-        }
-        
-        .nav-menu {
-          transition-delay: 0.4s;
         }
 
         /* Header states */
@@ -302,6 +298,7 @@ export default function Header() {
             max-height: 0;
             overflow: hidden;
             z-index: 50;
+            transition: max-height 0.3s ease, padding 0.3s ease;
           }
 
           .nav-menu-open {
@@ -314,16 +311,35 @@ export default function Header() {
             padding: 0;
           }
 
+          /* FIXED: Simplified nav item animations */
           .nav-item {
             width: 100%;
-            opacity: 0;
-            transform: translateY(-10px);
-            transition: all 0.3s ease;
+            transition: opacity 0.3s ease, transform 0.3s ease;
           }
 
-          .nav-menu-open .nav-item {
+          /* Hidden state */
+          .nav-item-hidden {
+            opacity: 0;
+            transform: translateY(-10px);
+            pointer-events: none;
+          }
+
+          /* Visible state - no delays to prevent conflicts */
+          .nav-item-visible {
             opacity: 1;
             transform: translateY(0);
+            pointer-events: auto;
+          }
+
+          /* Staggered animation using nth-child */
+          .nav-menu-open .nav-item:nth-child(1) { 
+            transition-delay: 0.1s; 
+          }
+          .nav-menu-open .nav-item:nth-child(2) { 
+            transition-delay: 0.15s; 
+          }
+          .nav-menu-open .nav-item:nth-child(3) { 
+            transition-delay: 0.2s; 
           }
 
           .nav-link {
@@ -364,13 +380,6 @@ export default function Header() {
           .menu-open {
             overflow: hidden;
           }
-        }
-
-        /* Enhanced animations for mobile */
-        @media (max-width: 768px) {
-          .nav-item:nth-child(1) { transition-delay: 0.1s; }
-          .nav-item:nth-child(2) { transition-delay: 0.2s; }
-          .nav-item:nth-child(3) { transition-delay: 0.3s; }
         }
 
         /* Dark mode adjustments */

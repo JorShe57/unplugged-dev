@@ -137,7 +137,7 @@ export default function Header() {
         </button>
 
         {/* Navigation Links */}
-        <NavigationMenu open={open} setOpen={setOpen} isMobile={isMobile} navLinks={navLinks} />
+        <NavigationMenu open={open} setOpen={setOpen} navLinks={navLinks} />
       </nav>
 
       {/* Component-specific styles */}

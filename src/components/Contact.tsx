@@ -124,7 +124,15 @@ export default function Contact() {
               </span>
               <div>
                 <div className="text-lg font-bold text-brewery-gold">Hours</div>
-                <div className="text-white">Daily 4PM – 10PM</div>
+                <div className="text-white text-sm leading-relaxed">
+                  <div>Tuesday: Closed</div>
+                  <div>Wednesday: 4–10 PM</div>
+                  <div>Thursday: 4–10 PM</div>
+                  <div>Friday: 4–10 PM</div>
+                  <div>Saturday: 11 AM–11 PM</div>
+                  <div>Sunday: 11 AM–8 PM</div>
+                  <div>Monday: Closed</div>
+                </div>
               </div>
             </div>
           </div>
@@ -136,7 +144,7 @@ export default function Contact() {
               <a href="https://www.facebook.com/unplugbrew" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="hover:text-brewery-primary transition-colors group touch-target">
                 <Facebook className="w-8 h-8" />
               </a>
-              <a href="https://instagram.com/unplugbrew" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="hover:text-brewery-primary transition-colors group touch-target">
+              <a href="https://www.instagram.com/unpluggedbrewing/?hl=en" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="hover:text-brewery-primary transition-colors group touch-target">
                 <Instagram className="w-8 h-8" />
               </a>
             </div>

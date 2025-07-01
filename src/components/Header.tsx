@@ -105,6 +105,7 @@ export default function Header() {
     <header
       ref={combinedRef}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 scroll-animate ${isVisible ? 'in-view' : ''} ${isScrolled ? 'header-scrolled' : 'header-top'} ${open ? 'menu-open' : ''}`}
+      style={{ marginBottom: '2rem' }}
     >
       <nav className="max-w-7xl mx-auto flex items-center justify-between px-4 py-3 header-nav scroll-animate">
         {/* Logo */}
@@ -121,20 +122,7 @@ export default function Header() {
         </a>
 
         {/* Mobile Menu Button */}
-        <button
-          className="md:hidden text-brewery-gold focus:outline-none touch-target mobile-menu-btn mobile-optimized"
-          onClick={() => setOpen(!open)}
-          aria-label="Toggle navigation"
-          aria-expanded={open}
-        >
-          <svg className="w-7 h-7 transition-transform duration-200" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-            <path 
-              strokeLinecap="round" 
-              strokeLinejoin="round" 
-              d={open ? 'M6 18L18 6M6 6l12 12' : 'M4 6h16M4 12h16M4 18h16'} 
-            />
-          </svg>
-        </button>
+        {/* Removed hamburger menu button */}
 
         {/* Navigation Links */}
         <NavigationMenu open={open} setOpen={setOpen} navLinks={navLinks} />

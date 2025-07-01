@@ -100,7 +100,7 @@ export default function Contact() {
               <Mail className="w-7 h-7 text-brewery-gold group-hover:text-brewery-primary transition-colors" />
               <div>
                 <div className="text-lg font-bold text-brewery-gold">Email</div>
-                <a href="mailto:info@unpluggedbrewery.com" className="text-white hover:text-brewery-gold transition-colors">info@unpluggedbrewery.com</a>
+                <a href="mailto:info@unpluggedbrewery.com" className="text-white hover:text-brewery-gold transition-colors">sales@unpluggedbrewery.com</a>
               </div>
             </div>
             <div className="group flex items-center gap-4 bg-brewery-dark/80 border-2 border-brewery-gold rounded-xl p-5 shadow-lg hover:scale-105 hover:shadow-2xl transition-transform duration-300 cursor-pointer contact-card scroll-animate touch-target">

@@ -303,7 +303,7 @@ export default function Header() {
           }
 
           .nav-menu-open {
-            max-height: 300px;
+            max-height: 100vh;
             padding: 1rem 0;
           }
 

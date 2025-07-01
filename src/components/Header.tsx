@@ -284,9 +284,10 @@ export default function Header() {
         @media (max-width: 768px) {
           .nav-menu {
             position: fixed;
-            top: 100%;
+            top: 0;
             left: 0;
             right: 0;
+            height: 100vh;
             flex-direction: column;
             gap: 0;
             width: 100%;
@@ -302,7 +303,7 @@ export default function Header() {
           }
 
           .nav-menu-open {
-            max-height: 300px;
+            max-height: 100vh;
             padding: 1rem 0;
           }
 

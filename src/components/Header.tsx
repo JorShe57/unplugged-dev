@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useInView } from 'react-intersection-observer';
+import NavigationMenu from './NavigationMenu';
 
 const navLinks = [
   { label: 'Facebook', href: 'https://www.facebook.com/unplugbrew/', external: true },
@@ -136,40 +137,7 @@ export default function Header() {
         </button>
 
         {/* Navigation Links */}
-        <ul className={`nav-menu scroll-animate ${open ? 'nav-menu-open' : 'nav-menu-closed'}`}>
-          {navLinks.map((link, idx) => (
-            <li key={link.href} className={`nav-item ${open ? 'nav-item-visible' : 'nav-item-hidden'}`}>
-              {link.external ? (
-                <a
-                  href={link.href}
-                  className="nav-link touch-target mobile-optimized"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => setOpen(false)}
-                >
-                  {link.label}
-                </a>
-              ) : (
-                <a
-                  href={link.href}
-                  className="nav-link touch-target mobile-optimized"
-                  onClick={() => setOpen(false)}
-                >
-                  {link.label}
-                </a>
-              )}
-            </li>
-          ))}
-        </ul>
-
-        {/* Mobile Menu Overlay */}
-        {open && (
-          <div 
-            className="mobile-menu-overlay"
-            onClick={() => setOpen(false)}
-            aria-hidden="true"
-          />
-        )}
+        <NavigationMenu open={open} setOpen={setOpen} isMobile={isMobile} navLinks={navLinks} />
       </nav>
 
       {/* Component-specific styles */}

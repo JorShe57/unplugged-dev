@@ -192,6 +192,7 @@ export default function Hero() {
       ref={combinedRef}
       className={`relative min-h-screen flex items-center justify-center text-center hero-root scroll-animate ${isVisible ? 'in-view' : ''} ${stateClass} ${surgeClass} ${loadedClass}`}
       aria-live="polite"
+      style={{ paddingTop: '5rem' }}
     >
       {/* Background */}
       <div

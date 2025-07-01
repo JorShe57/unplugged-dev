@@ -6,7 +6,7 @@ import NavigationMenu from './NavigationMenu';
 
 const navLinks = [
   { label: 'Facebook', href: 'https://www.facebook.com/unplugbrew/', external: true },
-  { label: 'Leave a Review', href: 'https://g.co/kgs/76LCxnz', external: true },
+  { label: 'Leave Review', href: 'https://g.co/kgs/76LCxnz', external: true },
   { label: 'Menu', href: '/menu', external: false },
 ];
 

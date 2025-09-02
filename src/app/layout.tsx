@@ -108,7 +108,7 @@ const structuredData = {
     postalCode: "44035",
     addressCountry: "US"
   },
-  telephone: "(440) 309-7928",
+  telephone: "+14403097928",
   email: "sales@unplugbrew.com",
   priceRange: "$$",
   openingHoursSpecification: [

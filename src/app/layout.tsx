@@ -102,32 +102,38 @@ const structuredData = {
   image: "https://www.unpluggedelyria.com/favicon.webp",
   address: {
     "@type": "PostalAddress",
-    streetAddress: "201 E Bridge St",
+    streetAddress: "201 E BridgeSt",
     addressLocality: "Elyria",
     addressRegion: "OH",
     postalCode: "44035",
     addressCountry: "US"
   },
-  telephone: "(440) 345-6972",
+  telephone: "(440) 309-7928",
   email: "sales@unplugbrew.com",
   priceRange: "$$",
   openingHoursSpecification: [
     {
       "@type": "OpeningHoursSpecification",
-      dayOfWeek: ["Tuesday", "Wednesday", "Thursday"],
+      dayOfWeek: ["Wednesday", "Thursday"],
       opens: "16:00",
       closes: "22:00"
     },
     {
-      "@type": "OpeningHoursSpecification", 
-      dayOfWeek: ["Friday", "Saturday"],
-      opens: "12:00",
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: "Friday",
+      opens: "14:30",
+      closes: "22:00"
+    },
+    {
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: "Saturday",
+      opens: "11:00",
       closes: "23:00"
     },
     {
       "@type": "OpeningHoursSpecification",
-      dayOfWeek: "Sunday", 
-      opens: "12:00",
+      dayOfWeek: "Sunday",
+      opens: "11:00",
       closes: "20:00"
     }
   ],

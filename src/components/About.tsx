@@ -4,8 +4,17 @@ import { Beer, Award, Hop } from 'lucide-react';
 import Counter from './Counter';
 import { useInView } from 'react-intersection-observer';
 
+// Custom Ribbon Icon
+const RibbonIcon = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M6 3L12 2L18 3V8L12 13L6 8V3Z" fill="currentColor" fillOpacity="0.3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M6 8L12 13V21L6 18V8Z" fill="currentColor" fillOpacity="0.2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M18 8L12 13V21L18 18V8Z" fill="currentColor" fillOpacity="0.2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
+
 const stats = [
-  { label: 'Est. 2020', value: 2020, icon: <Award className="w-7 h-7 text-brewery-gold" /> },
+  { label: 'Established', value: 2020, icon: <RibbonIcon className="w-7 h-7 text-brewery-gold" /> },
   { label: '12 Craft Beers', value: 12, icon: <Beer className="w-7 h-7 text-brewery-gold" /> },
   { label: '10,000+ Pints Served', value: 10000, icon: <Beer className="w-7 h-7 text-brewery-gold" /> },
   { label: 'Award-Winning', value: 8, icon: <Hop className="w-7 h-7 text-brewery-gold" /> },
@@ -110,14 +119,14 @@ export default function About() {
             {stats.map((stat, i) => (
               <div
                 key={stat.label}
-                className="group bg-white/80 dark:bg-brewery-dark/80 rounded-xl shadow-lg p-6 flex flex-col items-center border-2 border-brewery-gold hover:scale-105 hover:shadow-2xl transition-transform duration-300 cursor-pointer stat-card scroll-animate touch-target"
+                className="group bg-brewery-dark/90 dark:bg-brewery-dark/90 rounded-xl shadow-lg p-6 flex flex-col items-center border-2 border-brewery-gold hover:scale-105 hover:shadow-2xl transition-transform duration-300 cursor-pointer stat-card scroll-animate touch-target"
                 style={{ animationDelay: `${0.2 + i * 0.1}s` }}
               >
                 <span className="mb-2">{stat.icon}</span>
                 <span className="text-3xl font-extrabold text-brewery-gold mb-1">
                   {stat.value === 2020 ? 'Est. 2020' : stat.value.toLocaleString()}
                 </span>
-                <span className="text-md font-semibold text-brewery-primary text-center">{stat.label}</span>
+                <span className="text-sm font-semibold text-brewery-gold/80 text-center">{stat.label}</span>
               </div>
             ))}
           </div>

@@ -121,8 +121,8 @@ const structuredData = {
     {
       "@type": "OpeningHoursSpecification",
       dayOfWeek: "Friday",
-      opens: "14:30",
-      closes: "22:00"
+      opens: "16:00",
+      closes: "23:00"
     },
     {
       "@type": "OpeningHoursSpecification",

@@ -12,10 +12,10 @@ const nextConfig: NextConfig = {
               "default-src 'self'",
               "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-              "font-src 'self' https://fonts.gstatic.com",
+              "font-src 'self' data: https://fonts.gstatic.com",
               "img-src 'self' data: https: blob:",
               "frame-src 'self' https://widgets.sociablekit.com",
-              "connect-src 'self' https://api.sanity.io https://*.supabase.co",
+              "connect-src 'self' https://api.sanity.io https://*.supabase.co https://data.accentapi.com",
               "report-uri /api/csp-report"
             ].join('; ')
           }

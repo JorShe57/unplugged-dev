@@ -128,7 +128,7 @@ export default function Contact() {
                   <div>Tuesday: Closed</div>
                   <div>Wednesday: 4–10 PM</div>
                   <div>Thursday: 4–10 PM</div>
-                  <div>Friday: 2:30–10 PM</div>
+                  <div>Friday: 4–11 PM</div>
                   <div>Saturday: 11 AM–11 PM</div>
                   <div>Sunday: 11 AM–8 PM</div>
                   <div>Monday: Closed</div>

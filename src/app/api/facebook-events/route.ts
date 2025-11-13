@@ -20,6 +20,10 @@ export async function GET() {
 
     const data = await response.json();
     
+    // Log for debugging
+    console.log('SociableKit API Response Status:', response.status);
+    console.log('Events count:', data.events?.length || 0);
+    
     return NextResponse.json(data, {
       headers: {
         'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
@@ -27,6 +31,10 @@ export async function GET() {
     });
   } catch (error) {
     console.error('Error fetching Facebook events:', error);
+    console.error('Error details:', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+    });
     return NextResponse.json(
       { error: 'Failed to fetch events', events: [] },
       { status: 500 }

@@ -8,6 +8,7 @@ interface FacebookEvent {
   start_date: string;
   start_time: string;
   start_time_raw?: string;
+  start_timestamp?: string;
   end_date: string;
   end_time: string;
   start_day: string;
@@ -48,21 +49,50 @@ export default function FacebookEvents() {
 
         const data = await response.json();
         
+        console.log('Facebook Events API Response:', data);
+        
         if (data.events && Array.isArray(data.events)) {
+          console.log(`Found ${data.events.length} total events`);
+          
           // Filter to only show upcoming events
           const now = new Date();
           const upcomingEvents = data.events.filter((event: FacebookEvent) => {
-            const eventDate = new Date(event.start_time_raw || event.start_date);
-            return eventDate >= now;
+            // Try multiple date formats
+            let eventDate: Date;
+            if (event.start_time_raw) {
+              eventDate = new Date(event.start_time_raw);
+            } else if (event.start_timestamp) {
+              eventDate = new Date(parseInt(event.start_timestamp) * 1000);
+            } else {
+              eventDate = new Date(event.start_date);
+            }
+            
+            const isUpcoming = eventDate >= now;
+            console.log(`Event "${event.name}": ${eventDate.toISOString()} >= ${now.toISOString()}? ${isUpcoming}`);
+            return isUpcoming;
           });
           
-          setEvents(upcomingEvents.slice(0, 6)); // Show up to 6 upcoming events
+          console.log(`Filtered to ${upcomingEvents.length} upcoming events`);
+          
+          // If no upcoming events, show all events (maybe they're all in the future)
+          if (upcomingEvents.length === 0) {
+            console.log('No upcoming events found, showing all events instead');
+            setEvents(data.events.slice(0, 6));
+          } else {
+            setEvents(upcomingEvents.slice(0, 6)); // Show up to 6 upcoming events
+          }
         } else {
-          throw new Error('Invalid data format');
+          console.error('Invalid data format - events array not found:', data);
+          throw new Error('Invalid data format - events array not found');
         }
       } catch (error) {
         console.error('Error fetching Facebook events:', error);
+        console.error('Error details:', {
+          message: error instanceof Error ? error.message : 'Unknown error',
+          stack: error instanceof Error ? error.stack : undefined,
+        });
         setHasError(true);
+        setEvents([]); // Ensure events is empty on error
       } finally {
         setIsLoading(false);
       }
@@ -96,7 +126,7 @@ export default function FacebookEvents() {
     );
   }
 
-  if (hasError || events.length === 0) {
+  if (hasError) {
     return (
       <div className="text-center py-12">
         <p className="text-brewery-dark mb-4 font-semibold text-lg">Unable to load Facebook events</p>
@@ -107,6 +137,22 @@ export default function FacebookEvents() {
           className="text-brewery-dark underline hover:text-brewery-primary transition-colors font-medium"
         >
           View events on Facebook
+        </a>
+      </div>
+    );
+  }
+
+  if (events.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-brewery-dark mb-4 font-semibold text-lg">No upcoming events at this time</p>
+        <a 
+          href="https://www.facebook.com/unplugbrew/events" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="text-brewery-dark underline hover:text-brewery-primary transition-colors font-medium"
+        >
+          View all events on Facebook
         </a>
       </div>
     );

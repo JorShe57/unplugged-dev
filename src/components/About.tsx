@@ -30,39 +30,20 @@ export default function About() {
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
 
-  // Mobile detection
-  const [isMobile, setIsMobile] = useState(false);
-  
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth <= 768);
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
 
-  // Intersection observer with mobile-friendly settings
+  // Intersection observer with optimized settings
   const { ref, inView } = useInView({ 
     triggerOnce: true, 
-    threshold: 0.1,
-    rootMargin: '50px 0px',
+    threshold: 0.05,
+    rootMargin: '100px 0px',
   });
-
-  // Mobile fallback timer
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (!isVisible && isMobile) {
-        setIsVisible(true);
-      }
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [isVisible, isMobile]);
 
   // Update visibility
   useEffect(() => {
-    if (inView || isVisible) {
+    if (inView) {
       setIsVisible(true);
     }
-  }, [inView, isVisible]);
+  }, [inView]);
 
   // Combine refs
   const combinedRef = useCallback((el: HTMLDivElement | null) => {
@@ -74,7 +55,7 @@ export default function About() {
     <section
       id="about"
       ref={combinedRef}
-      className={`relative min-h-[80vh] flex items-center justify-center overflow-hidden bg-white dark:bg-brewery-dark text-brewery-dark dark:text-white scroll-animate ${isVisible ? 'in-view' : ''}`}
+      className={`relative min-h-[80vh] flex items-center justify-center overflow-hidden bg-white dark:bg-brewery-dark text-brewery-dark dark:text-white py-12 md:py-20`}
     >
       {/* Parallax Background */}
       <div
@@ -86,58 +67,73 @@ export default function About() {
       <div className="absolute inset-0 bg-gradient-to-r from-white/90 via-white/60 to-brewery-gold/20 dark:from-brewery-dark/90 dark:via-brewery-dark/60 dark:to-brewery-gold/10 z-10" />
       
       <div className="relative z-20 w-full max-w-7xl mx-auto flex flex-col md:flex-row items-center md:items-stretch gap-12 px-4 py-20 md:py-32">
-        {/* Left: Image & Gallery Preview */}
-        <div className="flex-1 flex flex-col items-center justify-center gap-6 about-image-section scroll-animate">
-          <div className="relative w-auto h-auto max-w-full max-h-[400px] rounded-3xl overflow-hidden shadow-2xl border-4 border-brewery-gold flex items-center justify-center bg-white/10">
+        {/* Left: Image Gallery */}
+        <div className={`flex-1 flex flex-col items-center justify-center gap-6 about-image-section scroll-animate ${isVisible ? 'in-view' : ''}`}>
+          {/* Main Featured Image */}
+          <div className="relative w-full max-w-md rounded-3xl overflow-hidden shadow-2xl border-4 border-brewery-gold bg-white">
             <img
               src={galleryImages[0].src}
               alt={galleryImages[0].alt}
-              className="object-contain max-w-full max-h-[400px]"
+              className="w-full h-auto object-cover"
               loading="eager"
-              style={{ background: '#fff' }}
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.style.display = 'none';
-              }}
+              style={{ display: 'block', minHeight: '200px' }}
             />
             
             {/* Decorative Icons */}
             <Hop className="absolute top-4 left-4 w-10 h-10 text-brewery-gold opacity-80 animate-float" />
             <Beer className="absolute bottom-4 right-4 w-10 h-10 text-brewery-gold opacity-80 animate-float-delay" />
           </div>
+          
+          {/* Gallery Grid */}
+          <div className="grid grid-cols-2 gap-4 w-full max-w-md">
+            {galleryImages.slice(1).map((img, idx) => (
+              <div
+                key={idx}
+                className="relative rounded-xl overflow-hidden shadow-lg border-2 border-brewery-gold/50 bg-white aspect-square"
+              >
+                <img
+                  src={img.src}
+                  alt={img.alt}
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                  style={{ display: 'block' }}
+                />
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Right: Content with glass effect */}
-        <div className="flex-1 flex flex-col justify-center gap-8 about-content-section scroll-animate bg-white rounded-3xl shadow-2xl border border-brewery-gold/40 p-8">
+        <div className={`flex-1 flex flex-col justify-center gap-8 about-content-section scroll-animate ${isVisible ? 'in-view' : ''} bg-white rounded-3xl shadow-2xl border border-brewery-gold/40 p-8`}>
           {/* Tagline/Hook */}
-          <div className="text-2xl md:text-3xl font-extrabold text-brewery-primary text-center mb-2">
+          <div className="text-2xl md:text-3xl font-extrabold text-brewery-primary text-center mb-2" style={{ color: '#8B4513' }}>
             Where craft meets character. <br className="hidden md:inline" /> Unplugged from the ordinary.
           </div>
           
           {/* Stats with glass effect */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-2 bg-white/50 dark:bg-brewery-dark/50 rounded-xl shadow border border-brewery-gold/20 backdrop-blur-sm p-2">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-2 bg-white/50 rounded-xl shadow border border-brewery-gold/20 backdrop-blur-sm p-2">
             {stats.map((stat, i) => (
               <div
                 key={stat.label}
-                className="group bg-brewery-dark/90 dark:bg-brewery-dark/90 rounded-xl shadow-lg p-6 flex flex-col items-center border-2 border-brewery-gold hover:scale-105 hover:shadow-2xl transition-transform duration-300 cursor-pointer stat-card scroll-animate touch-target"
-                style={{ animationDelay: `${0.2 + i * 0.1}s` }}
+                className="group bg-brewery-dark rounded-xl shadow-lg p-6 flex flex-col items-center border-2 border-brewery-gold hover:scale-105 hover:shadow-2xl transition-transform duration-300 cursor-pointer stat-card scroll-animate touch-target"
+                style={{ animationDelay: `${0.2 + i * 0.1}s`, backgroundColor: 'rgba(45, 24, 16, 0.9)' }}
               >
                 <span className="mb-2">{stat.icon}</span>
-                <span className="text-3xl font-extrabold text-brewery-gold mb-1">
+                <span className="text-3xl font-extrabold text-brewery-gold mb-1" style={{ color: '#d4af37' }}>
                   {stat.value === 2020 ? 'Est. 2020' : stat.value.toLocaleString()}
                 </span>
-                <span className="text-sm font-semibold text-brewery-gold/80 text-center">{stat.label}</span>
+                <span className="text-sm font-semibold text-center" style={{ color: '#d4af37' }}>{stat.label}</span>
               </div>
             ))}
           </div>
           
           {/* Founder Story / Philosophy */}
-          <div className="text-lg md:text-xl text-brewery-dark dark:text-white leading-relaxed space-y-2">
+          <div className="text-lg md:text-xl leading-relaxed space-y-2" style={{ color: '#2D1810' }}>
             <p>
-              <span className="font-bold text-brewery-gold">Our Philosophy:</span> We blend tradition with creativity, crafting beers that inspire connection and celebration. Every pint is a testament to our passion for quality, community, and authenticity.
+              <span className="font-bold" style={{ color: '#d4af37' }}>Our Philosophy:</span> We blend tradition with creativity, crafting beers that inspire connection and celebration. Every pint is a testament to our passion for quality, community, and authenticity.
             </p>
             <p>
-              <span className="font-bold text-brewery-gold">Meet the Founder:</span> From a garage dream to a local legend, our founder's journey is rooted in a love for bold flavors and unplugged moments. Join us in our taproom for a taste of something truly special.
+              <span className="font-bold" style={{ color: '#d4af37' }}>Meet the Founder:</span> From a garage dream to a local legend, our founder's journey is rooted in a love for bold flavors and unplugged moments. Join us in our taproom for a taste of something truly special.
             </p>
           </div>
           
@@ -151,7 +147,7 @@ export default function About() {
             >
               Visit Us &mdash; Get Directions
             </a>
-            <span className="text-brewery-gold text-lg font-semibold">Taproom open daily!</span>
+            <span className="text-lg font-semibold" style={{ color: '#d4af37' }}>Taproom open daily!</span>
           </div>
         </div>
       </div>
@@ -175,6 +171,12 @@ export default function About() {
         .stat-card:nth-child(2) { transition-delay: 0.4s; }
         .stat-card:nth-child(3) { transition-delay: 0.5s; }
         .stat-card:nth-child(4) { transition-delay: 0.6s; }
+        
+        /* Ensure images are visible */
+        .about-image-section img {
+          opacity: 1 !important;
+          display: block !important;
+        }
         
         /* Slideshow specific transitions */
         .transition-opacity {

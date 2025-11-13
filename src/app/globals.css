@@ -192,37 +192,64 @@ body {
 
 html {
   scroll-padding-top: 80px;
+  scroll-behavior: smooth;
   /* Better font rendering on iOS */
   -webkit-text-size-adjust: 100%;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
 /* Enable momentum scrolling on iOS */
 body {
   -webkit-overflow-scrolling: touch;
-  /* Prevent zoom on input focus (iOS) */
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  user-select: none;
+  /* Allow text selection for better UX */
+  -webkit-touch-callout: default;
+  -webkit-user-select: text;
+  user-select: text;
 }
 
-/* Universal mobile-first animations */
-.mobile-fade-in {
+/* Universal scroll animations - optimized */
+.scroll-animate {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), 
+              transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.scroll-animate.in-view {
   opacity: 1;
   transform: translateY(0);
-  transition: opacity 0.8s ease, transform 0.8s ease;
 }
 
-@media (min-width: 769px) {
-  .mobile-fade-in {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  
-  .mobile-fade-in.in-view {
+/* Mobile-first: show immediately on mobile to prevent content from disappearing */
+@media (max-width: 768px) {
+  .scroll-animate {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* Ensure content is visible after a short delay even if intersection observer hasn't fired */
+@media (min-width: 769px) {
+  .scroll-animate {
+    animation: fade-in-fallback 0.8s ease 1s forwards;
+  }
+  
+  @keyframes fade-in-fallback {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .scroll-animate.in-view {
+    animation: none;
   }
 }
 
@@ -334,10 +361,12 @@ body {
 /* Component styles */
 .section-divider-hero-menu {
   position: relative;
-  z-index: 20;
+  z-index: 10;
   margin-top: -2.5rem;
   margin-bottom: -2.5rem;
   pointer-events: none;
+  width: 100%;
+  overflow: hidden;
 }
 
 /* Universal animations */
@@ -378,10 +407,13 @@ body {
   }
 }
 
-/* Better hardware acceleration for smooth scrolling */
-* {
+/* Better hardware acceleration for smooth scrolling - only apply to elements that need it */
+.scroll-animate,
+.mobile-optimized,
+.mobile-optimized-img {
   -webkit-transform: translateZ(0);
   transform: translateZ(0);
+  will-change: transform, opacity;
 }
 
 /* Image loading optimization for iOS */

@@ -11,15 +11,15 @@ export default function Events() {
     <section
       id="events"
       ref={ref}
-      className={`relative py-20 px-2 md:px-0 bg-brewery-dark text-white overflow-hidden premium-bg ${inView ? 'animate-fade-in-up' : 'opacity-0 translate-y-10'}`}
+      className={`relative py-16 md:py-20 px-2 md:px-0 bg-brewery-dark text-white overflow-hidden premium-bg scroll-animate ${inView ? 'in-view animate-fade-in-up' : ''}`}
       style={{
         background:
           'radial-gradient(ellipse at 60% 40%, #DAA52033 0%, #1F1F1F 80%), url(/events1.png) center/cover no-repeat',
       }}
     >
       {/* Decorative Top Divider */}
-      <div className="section-divider-hero-menu w-screen left-1/2 -translate-x-1/2 absolute top-0 z-10" style={{position:'absolute',left:'50%',transform:'translateX(-50%)',width:'100vw',zIndex:10}} aria-hidden="true">
-        <svg width="100vw" height="32" viewBox="0 0 1440 32" fill="none" xmlns="http://www.w3.org/2000/svg" style={{display:'block',width:'100vw',minWidth:'100vw',maxWidth:'100vw'}}>
+      <div className="section-divider-hero-menu absolute top-0 left-0 right-0 z-10" aria-hidden="true">
+        <svg className="w-full h-8" viewBox="0 0 1440 32" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M0 16C120 32 360 0 720 0C1080 0 1320 32 1440 16V32H0V16Z" fill="#DAA520" fillOpacity="0.12" />
         </svg>
       </div>
@@ -57,8 +57,8 @@ export default function Events() {
       </div>
 
       {/* Decorative Bottom Divider */}
-      <div className="section-divider-hero-menu w-screen left-1/2 -translate-x-1/2 absolute bottom-0 z-10 mt-12" style={{position:'absolute',left:'50%',transform:'translateX(-50%)',width:'100vw',zIndex:10}} aria-hidden="true">
-        <svg width="100vw" height="32" viewBox="0 0 1440 32" fill="none" xmlns="http://www.w3.org/2000/svg" style={{display:'block',width:'100vw',minWidth:'100vw',maxWidth:'100vw'}}>
+      <div className="section-divider-hero-menu absolute bottom-0 left-0 right-0 z-10 mt-12" aria-hidden="true">
+        <svg className="w-full h-8" viewBox="0 0 1440 32" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M0 16C120 32 360 0 720 0C1080 0 1320 32 1440 16V32H0V16Z" fill="#DAA520" fillOpacity="0.12" />
         </svg>
       </div>

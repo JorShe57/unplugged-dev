@@ -37,39 +37,19 @@ export default function Hero() {
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
   
-  // Mobile detection
-  const [isMobile, setIsMobile] = useState(false);
-  
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth <= 768);
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
-  // Intersection observer with mobile-friendly settings
+  // Intersection observer with optimized settings
   const { ref, inView } = useInView({ 
     triggerOnce: true, 
-    threshold: 0.1,
-    rootMargin: '50px 0px',
+    threshold: 0.05,
+    rootMargin: '100px 0px',
   });
-
-  // Mobile fallback timer
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (!isVisible && isMobile) {
-        setIsVisible(true);
-      }
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [isVisible, isMobile]);
 
   // Update visibility
   useEffect(() => {
-    if (inView || isVisible) {
+    if (inView) {
       setIsVisible(true);
     }
-  }, [inView, isVisible]);
+  }, [inView]);
 
   // Combine refs
   const combinedRef = useCallback((el: HTMLDivElement | null) => {
@@ -91,12 +71,12 @@ export default function Hero() {
     return () => clearTimeout(timer);
   }, []);
 
-  // Throttled scroll handler for better performance
+  // Optimized scroll handler with debouncing
   const handleScroll = useCallback(() => {
-    if (isTransitioning.current) return;
+    if (isTransitioning.current || !sectionRef.current) return;
     
     // Calculate trigger point only once or when necessary
-    if (triggerPoint.current === null && sectionRef.current) {
+    if (triggerPoint.current === null) {
       const rect = sectionRef.current.getBoundingClientRect();
       const top = rect.top + window.scrollY;
       triggerPoint.current = top + rect.height * 0.25;
@@ -107,21 +87,13 @@ export default function Hero() {
     
     if (trigger === null) return;
 
-    if (!unplugged && scrollY > trigger) {
+    const shouldBeUnplugged = scrollY > trigger;
+
+    if (shouldBeUnplugged !== unplugged) {
       isTransitioning.current = true;
       setPowerSurge(true);
       setTimeout(() => {
-        setUnplugged(true);
-        setTimeout(() => {
-          setPowerSurge(false);
-          isTransitioning.current = false;
-        }, 200);
-      }, 150);
-    } else if (unplugged && scrollY <= trigger) {
-      isTransitioning.current = true;
-      setPowerSurge(true);
-      setTimeout(() => {
-        setUnplugged(false);
+        setUnplugged(shouldBeUnplugged);
         setTimeout(() => {
           setPowerSurge(false);
           isTransitioning.current = false;
@@ -130,22 +102,36 @@ export default function Hero() {
     }
   }, [unplugged]);
 
-  // Throttle scroll events for better performance
+  // Optimized scroll handler with requestAnimationFrame
   useEffect(() => {
-    let ticking = false;
+    let rafId: number | null = null;
+    let lastScrollY = window.scrollY;
     
-    const throttledScroll = () => {
-      if (!ticking) {
-        requestAnimationFrame(() => {
-          handleScroll();
-          ticking = false;
-        });
-        ticking = true;
+    const handleScrollOptimized = () => {
+      const currentScrollY = window.scrollY;
+      
+      // Only process if scroll changed significantly (reduce calculations)
+      if (Math.abs(currentScrollY - lastScrollY) < 10) return;
+      
+      lastScrollY = currentScrollY;
+      
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId);
       }
+      
+      rafId = requestAnimationFrame(() => {
+        handleScroll();
+        rafId = null;
+      });
     };
 
-    window.addEventListener('scroll', throttledScroll, { passive: true });
-    return () => window.removeEventListener('scroll', throttledScroll);
+    window.addEventListener('scroll', handleScrollOptimized, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScrollOptimized);
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId);
+      }
+    };
   }, [handleScroll]);
 
   // Reset trigger point on resize
@@ -192,7 +178,7 @@ export default function Hero() {
       ref={combinedRef}
       className={`relative min-h-screen flex items-center justify-center text-center hero-root scroll-animate ${isVisible ? 'in-view' : ''} ${stateClass} ${surgeClass} ${loadedClass}`}
       aria-live="polite"
-      style={{ paddingTop: '5rem' }}
+      style={{ paddingTop: '5rem', scrollMarginTop: '5rem' }}
     >
       {/* Background */}
       <div

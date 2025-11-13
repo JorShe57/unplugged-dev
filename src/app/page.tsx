@@ -8,12 +8,12 @@ import Footer from '@/components/Footer';
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-bg-brewery-dark">
+    <div className="min-h-screen bg-brewery-dark overflow-x-hidden">
       <Header />
-      <main>
+      <main className="relative">
         <HeroSection />
         <About />
-        <Menu /> {/* Replace your old Menu component with this */}
+        <Menu />
         <Events />
         <Contact />
       </main>

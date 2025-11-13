@@ -21,39 +21,20 @@ export default function Contact() {
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
 
-  // Mobile detection
-  const [isMobile, setIsMobile] = useState(false);
-  
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth <= 768);
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
 
-  // Intersection observer with mobile-friendly settings
+  // Intersection observer with optimized settings
   const { ref, inView } = useInView({ 
     triggerOnce: true, 
-    threshold: 0.1,
-    rootMargin: '50px 0px',
+    threshold: 0.05,
+    rootMargin: '100px 0px',
   });
-
-  // Mobile fallback timer
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (!isVisible && isMobile) {
-        setIsVisible(true);
-      }
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [isVisible, isMobile]);
 
   // Update visibility
   useEffect(() => {
-    if (inView || isVisible) {
+    if (inView) {
       setIsVisible(true);
     }
-  }, [inView, isVisible]);
+  }, [inView]);
 
   // Combine refs
   const combinedRef = useCallback((el: HTMLElement | null) => {
@@ -65,7 +46,7 @@ export default function Contact() {
     <section
       id="contact"
       ref={combinedRef}
-      className={`relative py-24 px-2 md:px-0 bg-brewery-dark text-white overflow-hidden premium-bg scroll-animate ${isVisible ? 'in-view' : ''}`}
+      className={`relative py-16 md:py-24 px-2 md:px-0 bg-brewery-dark text-white overflow-hidden premium-bg scroll-animate ${isVisible ? 'in-view' : ''}`}
     >
       {/* Backgrounds & Overlays */}
       <WoodGrainOverlay />

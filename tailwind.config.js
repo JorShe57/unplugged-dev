@@ -9,28 +9,16 @@ module.exports = {
     extend: {
       colors: {
         brewery: {
-          primary: '#8B4513', // Brown
-          gold: '#DAA520',    // Gold accent
-          dark: '#1F1F1F',    // Dark background
+          primary: '#8B4513',
+          gold: '#DAA520',
+          dark: '#2D1810',
         },
-      },
-    },
-  },
-  plugins: [],
-}; 
-module.exports = {
-  // ... your existing config
-  theme: {
-    extend: {
-      colors: {
         'brewery-gold': '#d4af37',
         'brewery-primary': '#8B4513', 
         'brewery-dark': '#2D1810',
-        // Add your other custom colors here
-      }
-    }
+      },
+    },
   },
-  // Add this plugin to force colors on iOS
   plugins: [
     function({ addUtilities }) {
       addUtilities({

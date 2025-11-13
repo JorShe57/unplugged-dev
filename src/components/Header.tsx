@@ -26,35 +26,15 @@ export default function Header() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Intersection observer with mobile-friendly settings
-  const { ref, inView } = useInView({ 
-    triggerOnce: true, 
-    threshold: 0.1,
-    rootMargin: '50px 0px',
-  });
-
-  // Mobile fallback timer
+  // Header should always be visible - no need for intersection observer
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (!isVisible && isMobile) {
-        setIsVisible(true);
-      }
-    }, 200); // Faster for header
-    return () => clearTimeout(timer);
-  }, [isVisible, isMobile]);
+    setIsVisible(true);
+  }, []);
 
-  // Update visibility
-  useEffect(() => {
-    if (inView || isVisible) {
-      setIsVisible(true);
-    }
-  }, [inView, isVisible]);
-
-  // Combine refs
+  // Set ref directly
   const combinedRef = useCallback((el: HTMLElement | null) => {
-    ref(el);
     headerRef.current = el;
-  }, [ref]);
+  }, []);
 
   // Handle scroll effects
   useEffect(() => {
@@ -104,8 +84,7 @@ export default function Header() {
   return (
     <header
       ref={combinedRef}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 scroll-animate ${isVisible ? 'in-view' : ''} ${isScrolled ? 'header-scrolled' : 'header-top'} ${open ? 'menu-open' : ''}`}
-      style={{ marginBottom: '2rem' }}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'header-scrolled' : 'header-top'} ${open ? 'menu-open' : ''}`}
     >
       <nav className="max-w-7xl mx-auto flex items-center justify-between px-4 py-3 header-nav scroll-animate">
         {/* Logo */}

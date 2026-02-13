@@ -18,7 +18,7 @@ export default function Header() {
 
   // Mobile detection
   const [isMobile, setIsMobile] = useState(false);
-  
+
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth <= 768);
     checkMobile();
@@ -88,15 +88,15 @@ export default function Header() {
     >
       <nav className="max-w-7xl mx-auto flex items-center justify-between px-4 py-3 header-nav scroll-animate">
         {/* Logo */}
-        <a 
-          href="/" 
+        <a
+          href="/"
           className="flex items-center touch-target logo-container mobile-optimized"
           onClick={() => setOpen(false)}
         >
-          <img 
-            src="/favicon.webp" 
-            alt="Unplugged Brewery Logo" 
-            className="h-10 w-10 object-contain mobile-optimized-img header-logo" 
+          <img
+            src="/favicon.webp"
+            alt="Unplugged Brewery Logo"
+            className="h-10 w-10 object-contain mobile-optimized-img header-logo"
           />
         </a>
 
@@ -118,65 +118,42 @@ export default function Header() {
           transition-delay: 0.2s;
         }
         
-        .mobile-menu-btn {
-          transition-delay: 0.3s;
-        }
-
-        /* Header states */
+        /* Header states - Liquid Glass theme */
         .header-top {
-          background: rgba(218, 165, 32, 0.2);
-          backdrop-filter: blur(12px);
-          -webkit-backdrop-filter: blur(12px);
-          border-bottom: 1px solid rgba(218, 165, 32, 0.3);
-          box-shadow: 0 0 32px 4px rgba(255, 215, 0, 0.35);
+          background: rgba(18, 10, 7, 0.4);
+          backdrop-filter: blur(16px);
+          -webkit-backdrop-filter: blur(16px);
+          border-bottom: 1px solid rgba(230, 179, 37, 0.2);
+          box-shadow: 0 4px 24px -1px rgba(0, 0, 0, 0.2);
         }
 
         .header-scrolled {
-          background: rgba(218, 165, 32, 0.4);
-          backdrop-filter: blur(16px);
-          -webkit-backdrop-filter: blur(16px);
-          border-bottom: 1px solid rgba(218, 165, 32, 0.5);
-          box-shadow: 0 4px 32px 4px rgba(255, 215, 0, 0.4), 0 2px 16px rgba(0, 0, 0, 0.2);
+          background: rgba(18, 10, 7, 0.85);
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
+          border-bottom: 1px solid rgba(230, 179, 37, 0.3);
+          box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.4);
         }
 
         .header-logo {
-          transition: all 0.3s ease;
-          filter: drop-shadow(0 0 8px rgba(218, 165, 32, 0.5));
+          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+          filter: drop-shadow(0 0 8px rgba(230, 179, 37, 0.3));
         }
 
         .header-logo:hover {
-          transform: scale(1.05);
-          filter: drop-shadow(0 0 12px rgba(218, 165, 32, 0.8));
-        }
-
-        /* Mobile menu button */
-        .mobile-menu-btn {
-          border-radius: 0.5rem;
-          padding: 0.5rem;
-          background: rgba(218, 165, 32, 0.1);
-          border: 1px solid rgba(218, 165, 32, 0.3);
-          transition: all 0.2s ease;
-        }
-
-        .mobile-menu-btn:hover {
-          background: rgba(218, 165, 32, 0.2);
-          border-color: rgba(218, 165, 32, 0.5);
-        }
-
-        .mobile-menu-btn:active {
-          transform: scale(0.95);
+          transform: scale(1.08) rotate(5deg);
+          filter: drop-shadow(0 0 12px rgba(230, 179, 37, 0.6));
         }
 
         /* Navigation menu */
         .nav-menu {
           display: flex;
           flex-direction: row;
-          gap: 2rem;
+          gap: 2.5rem;
           align-items: center;
           position: static;
           width: auto;
           background: transparent;
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .nav-item {
@@ -185,34 +162,35 @@ export default function Header() {
 
         .nav-link {
           display: block;
-          padding: 0.5rem 1rem;
-          color: #d4af37;
+          padding: 0.5rem 0.25rem;
+          color: #FDF5E6;
           text-decoration: none;
-          border-radius: 0.5rem;
-          font-weight: 600;
-          transition: all 0.2s ease;
+          font-family: var(--font-jost);
+          font-weight: 500;
+          letter-spacing: 0.05em;
+          text-transform: uppercase;
+          font-size: 0.875rem;
+          transition: all 0.3s ease;
           position: relative;
-          overflow: hidden;
         }
 
-        .nav-link::before {
+        .nav-link::after {
           content: '';
           position: absolute;
-          inset: 0;
-          background: linear-gradient(135deg, rgba(218, 165, 32, 0.2) 0%, rgba(218, 165, 32, 0.1) 100%);
-          opacity: 0;
-          transition: opacity 0.2s ease;
-          border-radius: 0.5rem;
-        }
-
-        .nav-link:hover::before {
-          opacity: 1;
+          bottom: 0;
+          left: 0;
+          width: 0;
+          height: 1px;
+          background: #E6B325;
+          transition: width 0.3s ease;
         }
 
         .nav-link:hover {
-          color: #8b4513;
-          transform: translateY(-1px);
-          box-shadow: 0 4px 12px rgba(218, 165, 32, 0.3);
+          color: #E6B325;
+        }
+
+        .nav-link:hover::after {
+          width: 100%;
         }
 
         /* Mobile menu styles */
@@ -224,140 +202,32 @@ export default function Header() {
             right: 0;
             height: 100vh;
             flex-direction: column;
-            gap: 0;
+            justify-content: center;
+            gap: 1.5rem;
             width: 100%;
-            background: rgba(44, 24, 16, 0.95);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border-top: 1px solid rgba(218, 165, 32, 0.3);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            background: rgba(18, 10, 7, 0.98);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             max-height: 0;
             overflow: hidden;
             z-index: 50;
-            transition: max-height 0.3s ease, padding 0.3s ease;
+            transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
           }
 
           .nav-menu-open {
             max-height: 100vh;
-            padding: 1rem 0;
-          }
-
-          .nav-menu-closed {
-            max-height: 0;
-            padding: 0;
-          }
-
-          /* FIXED: Simplified nav item animations */
-          .nav-item {
-            width: 100%;
-            transition: opacity 0.3s ease, transform 0.3s ease;
-          }
-
-          /* Hidden state */
-          .nav-item-hidden {
-            opacity: 0;
-            transform: translateY(-10px);
-            pointer-events: none;
-          }
-
-          /* Visible state - no delays to prevent conflicts */
-          .nav-item-visible {
-            opacity: 1;
-            transform: translateY(0);
-            pointer-events: auto;
-          }
-
-          /* Staggered animation using nth-child */
-          .nav-menu-open .nav-item:nth-child(1) { 
-            transition-delay: 0.1s; 
-          }
-          .nav-menu-open .nav-item:nth-child(2) { 
-            transition-delay: 0.15s; 
-          }
-          .nav-menu-open .nav-item:nth-child(3) { 
-            transition-delay: 0.2s; 
           }
 
           .nav-link {
-            padding: 1rem 2rem;
-            border-radius: 0;
-            font-size: 1.1rem;
-            border-bottom: 1px solid rgba(218, 165, 32, 0.1);
-          }
-
-          .nav-link:last-child {
-            border-bottom: none;
-          }
-
-          .nav-link::before {
-            border-radius: 0;
-          }
-
-          .nav-link:hover {
-            background: rgba(218, 165, 32, 0.1);
-            transform: none;
-            box-shadow: none;
-          }
-
-          /* Mobile menu overlay */
-          .mobile-menu-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.3);
-            z-index: 40;
-            backdrop-filter: blur(2px);
-            -webkit-backdrop-filter: blur(2px);
-          }
-
-          /* Prevent menu from extending beyond viewport */
-          .menu-open {
-            overflow: hidden;
-          }
-        }
-
-        /* Dark mode adjustments */
-        .dark .header-top {
-          background: rgba(26, 15, 8, 0.8);
-          border-bottom-color: rgba(218, 165, 32, 0.2);
-        }
-
-        .dark .header-scrolled {
-          background: rgba(26, 15, 8, 0.9);
-          border-bottom-color: rgba(218, 165, 32, 0.3);
-        }
-
-        .dark .nav-menu {
-          background: rgba(26, 15, 8, 0.95);
-        }
-
-        .dark .mobile-menu-btn {
-          background: rgba(218, 165, 32, 0.15);
-          border-color: rgba(218, 165, 32, 0.3);
-        }
-
-        .dark .mobile-menu-btn:hover {
-          background: rgba(218, 165, 32, 0.25);
-        }
-
-        /* Accessibility improvements */
-        @media (prefers-reduced-motion: reduce) {
-          .nav-menu,
-          .nav-item,
-          .nav-link,
-          .mobile-menu-btn,
-          .header-logo {
-            transition-duration: 0.1s !important;
+            font-size: 1.5rem;
+            padding: 1rem;
           }
         }
 
         /* Focus states for accessibility */
-        .nav-link:focus,
-        .mobile-menu-btn:focus {
-          outline: 2px solid #d4af37;
-          outline-offset: 2px;
+        .nav-link:focus {
+          outline: 2px solid #E6B325;
+          outline-offset: 4px;
         }
       `}</style>
     </header>

@@ -36,10 +36,10 @@ export default function Hero() {
   const [showGetUnplugged, setShowGetUnplugged] = useState(true);
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
-  
+
   // Intersection observer with optimized settings
-  const { ref, inView } = useInView({ 
-    triggerOnce: true, 
+  const { ref, inView } = useInView({
+    triggerOnce: true,
     threshold: 0.05,
     rootMargin: '100px 0px',
   });
@@ -56,7 +56,7 @@ export default function Hero() {
     ref(el);
     sectionRef.current = el;
   }, [ref]);
-  
+
   // Cache calculations for better performance
   const triggerPoint = useRef<number | null>(null);
   const isTransitioning = useRef(false);
@@ -74,7 +74,7 @@ export default function Hero() {
   // Optimized scroll handler with debouncing
   const handleScroll = useCallback(() => {
     if (isTransitioning.current || !sectionRef.current) return;
-    
+
     // Calculate trigger point only once or when necessary
     if (triggerPoint.current === null) {
       const rect = sectionRef.current.getBoundingClientRect();
@@ -84,7 +84,7 @@ export default function Hero() {
 
     const scrollY = window.scrollY;
     const trigger = triggerPoint.current;
-    
+
     if (trigger === null) return;
 
     const shouldBeUnplugged = scrollY > trigger;
@@ -106,19 +106,19 @@ export default function Hero() {
   useEffect(() => {
     let rafId: number | null = null;
     let lastScrollY = window.scrollY;
-    
+
     const handleScrollOptimized = () => {
       const currentScrollY = window.scrollY;
-      
+
       // Only process if scroll changed significantly (reduce calculations)
       if (Math.abs(currentScrollY - lastScrollY) < 10) return;
-      
+
       lastScrollY = currentScrollY;
-      
+
       if (rafId !== null) {
         cancelAnimationFrame(rafId);
       }
-      
+
       rafId = requestAnimationFrame(() => {
         handleScroll();
         rafId = null;
@@ -139,7 +139,7 @@ export default function Hero() {
     const handleResize = () => {
       triggerPoint.current = null;
     };
-    
+
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
@@ -194,26 +194,26 @@ export default function Hero() {
       {/* Overlays */}
       <div className="absolute inset-0 z-10 hero-overlay" />
       <div className="absolute inset-0 z-20 pointer-events-none hero-gradient" />
-      
+
       {/* Content */}
       <div className="relative z-40 flex flex-col items-center justify-center w-full px-4 py-16 sm:py-32 hero-content scroll-animate">
         {/* Logo */}
-        <img 
-          src="/favicon.webp" 
-          alt="Unplugged Brewery Logo" 
-          className="w-24 h-24 sm:w-36 sm:h-36 mb-4 rounded-full shadow-lg border-4 border-brewery-gold bg-white/80 object-contain logo-img" 
+        <img
+          src="/favicon.webp"
+          alt="Unplugged Brewery Logo"
+          className="w-24 h-24 sm:w-36 sm:h-36 mb-4 rounded-full shadow-lg border-4 border-brewery-gold bg-white/80 object-contain logo-img"
         />
-        
+
         {/* Title */}
         <h1 className="text-[clamp(2rem,7vw,6rem)] sm:text-[clamp(2.5rem,8vw,6rem)] font-extrabold text-brewery-gold drop-shadow-xl tracking-tight mb-2 font-hero relative hero-title scroll-animate">
           Unplugged Brewery
         </h1>
-        
+
         {/* Tagline */}
         <p className="text-base sm:text-lg md:text-2xl text-white mb-10 max-w-xl mx-auto font-light tracking-wide relative hero-tagline scroll-animate">
           Crafting unique brews for unplugged moments.
         </p>
-        
+
         {/* Navigation Buttons */}
         <div className="flex flex-wrap justify-center gap-6 mt-4 nav-btns-row scroll-animate">
           {navCards.map((card, idx) => (
@@ -228,11 +228,11 @@ export default function Hero() {
             </a>
           ))}
         </div>
-        
+
         {/* Get Unplugged message */}
         {showGetUnplugged && (
           <div
-            className={`get-unplugged-text transition-opacity duration-700 ease-out text-4xl md:text-5xl font-bold drop-shadow-lg mt-10 mb-8 scroll-animate
+            className={`get-unplugged-text transition-opacity duration-700 ease-out text-4xl md:text-5xl font-bold drop-shadow-lg mt-8 mb-6 scroll-animate relative z-[60]
               ${unplugged ? (getUnpluggedFlicker ? 'flicker' : 'stay-bright') : (pageLoaded ? 'glow-bright' : 'glow-dark')}
             `}
             aria-live="polite"
@@ -242,7 +242,7 @@ export default function Hero() {
           </div>
         )}
       </div>
-      
+
       {/* Scroll Indicator */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center scroll-indicator scroll-animate">
         <span className="text-xs mb-1 tracking-widest uppercase opacity-80">Learn More</span>
@@ -250,14 +250,14 @@ export default function Hero() {
           <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
         </svg>
       </div>
-      
+
       {/* Fixed Section Divider */}
       <div className="absolute bottom-0 left-0 right-0 z-10" aria-hidden="true">
         <svg className="w-full h-8" viewBox="0 0 1440 32" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M0 16C120 32 360 0 720 0C1080 0 1320 32 1440 16V32H0V16Z" fill="#DAA520" fillOpacity="0.12" />
         </svg>
       </div>
-      
+
       {/* Component-specific styles - kept all unique unplugged effect styling */}
       <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@900&display=swap');
@@ -319,207 +319,124 @@ export default function Hero() {
           }
         }
         
-        /* Hero-specific unplugged effect system */
-        .hero-root {
-          --glow-color: #fffbe6;
-          --glow-shadow: 0 0 32px 8px var(--glow-color), 0 0 8px 2px #ffe066;
-          --title-glow: 0 0 48px 8px #ffe066, 0 0 8px 2px #fffbe6;
-          --logo-glow: 0 0 32px 8px #ffe066, 0 0 8px 2px #fffbe6;
-          --btn-glow: 0 0 32px 8px #ffe066, 0 0 16px 4px #fffbe6;
-          --btn-bg-glow: rgba(255, 224, 102, 0.35);
-          --btn-inner-glow: 0 0 16px 4px #fffbe6 inset, 0 0 8px 2px #ffe066 inset;
-          --power-line-color: #ffe066;
-          --spark-color: #fffbe6;
-          --bg-brightness: 1.2;
-          --bg-saturate: 1.1;
-          --overlay-bg: rgba(0,0,0,0.3);
-          --gradient: radial-gradient(ellipse at center, rgba(255,255,200,0.15) 0%, rgba(0,0,0,0.7) 100%);
-          --foam-opacity: 1;
-          --cta-bright: #ffe066;
-          --cta-dark: #bfae5a;
-          --btn-bg: #ffe066;
-          --btn-text: #2d2d2d;
-          --nav-btn-bg: rgba(255,255,255,0.12);
-          --nav-btn-border: #ffe066;
-          --nav-btn-glow: 0 0 12px 2px #ffe066;
-          --scroll-indicator: #ffe066;
-          --title-filter: brightness(1.2) contrast(1.1) saturate(1.1);
-          --logo-filter: brightness(1.2) contrast(1.1) saturate(1.1);
-          --breathing-scale: 1.04;
-          --breathing-shadow: 0 8px 48px #ffe066a0, 0 2px 0 #fff6;
-          --transition: all 0.8s cubic-bezier(0.4,0,0.2,1);
-          --settle-transition: all 0.4s ease-out;
-          --scale: 1;
-          --opacity: 1;
-          --desaturate: 0;
-          --animation-speed: 1;
-          --get-unplugged-color: #ffe066;
-          transform: translateZ(0);
-          will-change: auto;
-        }
-        
-        .hero-root.unplugged {
-          --glow-color: #222;
-          --glow-shadow: none;
-          --title-glow: none;
-          --logo-glow: none;
-          --btn-glow: none;
-          --btn-bg-glow: transparent;
-          --btn-inner-glow: none;
-          --power-line-color: #444;
-          --spark-color: #444;
-          --bg-brightness: 0.6;
-          --bg-saturate: 0.2;
-          --overlay-bg: rgba(0,0,0,0.7);
-          --gradient: radial-gradient(ellipse at center, rgba(34,34,34,0.1) 0%, rgba(0,0,0,0.9) 100%);
-          --foam-opacity: 0.15;
-          --cta-bright: #888;
-          --cta-dark: #444;
-          --btn-bg: #444;
-          --btn-text: #bbb;
-          --nav-btn-bg: rgba(44,44,44,0.5);
-          --nav-btn-border: #444;
-          --nav-btn-glow: none;
-          --scroll-indicator: #444;
-          --title-filter: brightness(0.6) grayscale(0.8) contrast(0.7) saturate(0.2);
-          --logo-filter: brightness(0.6) grayscale(0.8) contrast(0.7) saturate(0.2);
-          --breathing-scale: 1.01;
-          --breathing-shadow: 0 2px 8px #222a, 0 1px 0 #2226;
-          --scale: 0.98;
-          --opacity: 0.92;
-          --desaturate: 0.8;
-          --animation-speed: 0.4;
-        }
+      /* Hero-specific unplugged effect system - Liquid Glass Revamped */
+      .hero-root {
+        --glow-color: rgba(230, 179, 37, 0.4);
+        --glow-shadow: 0 0 50px 15px var(--glow-color), 0 0 20px 8px rgba(253, 245, 230, 0.4);
+        --title-glow: 0 0 70px 15px rgba(230, 179, 37, 0.6), 0 0 20px 4px rgba(253, 245, 230, 0.5);
+        --logo-glow: 0 0 45px 10px rgba(230, 179, 37, 0.5);
+        --btn-glow: 0 10px 30px -5px rgba(18, 10, 7, 0.4);
+        --btn-inner-glow: 0 0 25px rgba(253, 245, 230, 0.15) inset;
+        --bg-brightness: 1.25;
+        --bg-saturate: 1.35;
+        --overlay-bg: rgba(18, 10, 7, 0.35);
+        --gradient: radial-gradient(circle at center, rgba(230, 179, 37, 0.15) 0%, rgba(18, 10, 7, 0.7) 100%);
+        --cta-bright: #E6B325;
+        --btn-bg: #C68642;
+        --btn-text: #120A07;
+        --nav-btn-border: rgba(230, 179, 37, 0.5);
+        --scroll-indicator: #E6B325;
+        --title-filter: brightness(1.2) contrast(1.1);
+        --animation-speed: 1;
+        --get-unplugged-color: #E6B325;
+        transform: translateZ(0);
+      }
+      
+      .hero-root.unplugged {
+        --glow-color: transparent;
+        --glow-shadow: none;
+        --title-glow: none;
+        --logo-glow: none;
+        --btn-glow: none;
+        --bg-brightness: 0.65;
+        --bg-saturate: 0.25;
+        --overlay-bg: rgba(18, 10, 7, 0.7);
+        --gradient: radial-gradient(circle at center, rgba(18, 10, 7, 0.2) 0%, rgba(18, 10, 7, 0.85) 100%);
+        --cta-bright: #4A3B34;
+        --btn-bg: #2A1F1A;
+        --btn-text: #777;
+        --nav-btn-border: #4A3B34;
+        --scroll-indicator: #4A3B34;
+        --title-filter: brightness(0.75) grayscale(0.85);
+        --animation-speed: 0.6;
+      }
         
         .hero-root {
-          transition: var(--transition);
+          transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
         .hero-root.power-surge {
-          animation: surge-flash 0.18s linear 2;
+          animation: surge-flash 0.25s ease-out 2;
         }
         
         @keyframes surge-flash {
-          0% { filter: brightness(1.7); }
-          50% { filter: brightness(0.7); }
-          100% { filter: brightness(1); }
+          0%, 100% { filter: brightness(1); }
+          50% { filter: brightness(1.8); }
         }
         
         .hero-overlay {
           background: var(--overlay-bg);
-          transition: background 0.8s cubic-bezier(0.4,0,0.2,1);
+          transition: background 1s ease-in-out;
         }
         
         .hero-gradient {
           background: var(--gradient);
-          transition: background 0.8s cubic-bezier(0.4,0,0.2,1);
+          transition: background 1s ease-in-out;
         }
         
         .logo-img {
           box-shadow: var(--logo-glow);
-          filter: var(--logo-filter) grayscale(var(--desaturate));
-          transition: var(--transition), var(--settle-transition);
-          transform: scale(var(--scale)) translateZ(0);
-          opacity: var(--opacity);
-          -webkit-transform: translateZ(0);
-          -webkit-backface-visibility: hidden;
-          backface-visibility: hidden;
+          filter: var(--logo-filter);
+          transition: all 1s ease;
+          border-color: #E6B325 !important;
         }
         
         .hero-title {
+          font-family: var(--font-serif);
           text-shadow: var(--title-glow);
-          filter: var(--title-filter) grayscale(var(--desaturate));
-          transition: var(--transition), var(--settle-transition);
-          transform: scale(var(--scale)) translateZ(0);
-          opacity: var(--opacity);
-          animation: breathing calc(3s * var(--animation-speed)) ease-in-out infinite;
-        }
-        
-        .hero-root.unplugged .hero-title {
-          animation-duration: 6s;
-        }
-        
-        @keyframes breathing {
-          0%, 100% { transform: scale(1) translateZ(0); text-shadow: var(--breathing-shadow); }
-          50% { transform: scale(var(--breathing-scale)) translateZ(0); text-shadow: var(--breathing-shadow); }
+          filter: var(--title-filter);
+          transition: all 1s ease;
+          letter-spacing: -0.02em;
+          color: #E6B325 !important;
         }
         
         .hero-tagline {
-          filter: var(--title-filter) grayscale(var(--desaturate));
-          transition: var(--transition), var(--settle-transition);
-          transform: scale(var(--scale)) translateZ(0);
-          opacity: var(--opacity);
+          font-family: var(--font-sans);
+          color: #FDF5E6 !important;
+          transition: all 1s ease;
         }
         
         .nav-btn {
           background: var(--btn-bg);
           color: var(--btn-text);
-          border: 2px solid var(--nav-btn-border);
-          box-shadow: var(--btn-glow), 0 0 0 0 var(--btn-bg-glow);
-          filter: var(--title-filter) grayscale(var(--desaturate));
-          transition: var(--transition), var(--settle-transition);
-          border-radius: 1rem;
-          padding: 1.5rem 2rem;
-          transform: scale(var(--scale)) translateZ(0);
-          opacity: var(--opacity);
-          position: relative;
-          overflow: hidden;
+          border: 1px solid var(--nav-btn-border);
+          box-shadow: var(--btn-glow);
+          transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+          border-radius: 9999px;
+          padding: 1rem 2.5rem;
+          font-family: var(--font-sans);
+          font-weight: 600;
+          letter-spacing: 0.02em;
+          text-transform: uppercase;
+          font-size: 0.8125rem;
         }
         
-        .hero-root.plugged .nav-btn {
-          background: linear-gradient(135deg, #ffe066 60%, #fffbe6 100%);
-          box-shadow: 0 0 32px 8px #ffe06699, 0 0 16px 4px #fffbe6cc, var(--btn-glow);
-          filter: brightness(1.15) saturate(1.2);
-          animation: nav-btn-breathing 2.8s ease-in-out infinite;
-        }
-        
-        .hero-root.plugged .nav-btn::before {
-          content: '';
-          position: absolute;
-          inset: 0;
-          background: var(--btn-bg-glow);
-          z-index: 0;
-          border-radius: 1rem;
-          pointer-events: none;
-          box-shadow: 0 0 32px 16px #ffe06655, 0 0 16px 8px #fffbe6aa;
-          opacity: 0.7;
-        }
-        
-        .hero-root.plugged .nav-btn::after {
-          content: '';
-          position: absolute;
-          inset: 0;
-          border-radius: 1rem;
-          pointer-events: none;
-          box-shadow: var(--btn-inner-glow);
-          opacity: 0.7;
-        }
-        
-        @keyframes nav-btn-breathing {
-          0%, 100% { box-shadow: 0 0 32px 8px #ffe06699, 0 0 16px 4px #fffbe6cc, var(--btn-glow); }
-          50% { box-shadow: 0 0 48px 16px #ffe066cc, 0 0 32px 8px #fffbe6ee, var(--btn-glow); }
-        }
-        
-        .hero-root.unplugged .nav-btn {
-          background: #232323;
-          box-shadow: none;
-          filter: brightness(0.7) grayscale(0.7);
-          animation: none;
-        }
-        
-        .foam-bubbles {
-          opacity: var(--foam-opacity);
-          transition: opacity 0.8s cubic-bezier(0.4,0,0.2,1);
+        .hero-root.plugged .nav-btn:hover {
+          transform: translateY(-5px) scale(1.05);
+          background: #E6B325;
+          box-shadow: 0 15px 40px -10px rgba(230, 179, 37, 0.5);
         }
         
         .scroll-indicator svg {
           color: var(--scroll-indicator);
-          transition: color 0.8s cubic-bezier(0.4,0,0.2,1);
+          transition: color 1s ease;
         }
         
-        .scroll-indicator span {
-          color: var(--scroll-indicator);
-          transition: color 0.8s cubic-bezier(0.4,0,0.2,1);
+        .get-unplugged-text {
+          font-family: var(--font-serif);
+          text-shadow: 0 0 30px rgba(230, 179, 37, 0.4);
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
         }
         
         .hero-root .animate-bounce {

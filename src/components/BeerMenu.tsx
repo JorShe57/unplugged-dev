@@ -33,8 +33,8 @@ export default function BeerMenu() {
 
 
   // Intersection observer with optimized settings
-  const { ref, inView } = useInView({ 
-    triggerOnce: true, 
+  const { ref, inView } = useInView({
+    triggerOnce: true,
     threshold: 0.05,
     rootMargin: '100px 0px',
   });
@@ -151,105 +151,98 @@ export default function BeerMenu() {
     <section
       id="menu"
       ref={combinedRef}
-      className={`beer-menu-section scroll-animate ${isVisible ? 'in-view' : ''}`}
+      className={`relative py-16 scroll-animate ${isVisible ? 'in-view' : ''}`}
     >
-      {/* Section Divider */}
-      <div className="section-divider">
-        <svg width="100%" height="32" viewBox="0 0 1440 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M0 16C120 32 360 0 720 0C1080 0 1320 32 1440 16V32H0V16Z" fill="#DAA520" fillOpacity="0.12" />
-        </svg>
-      </div>
+      <div className="max-w-6xl mx-auto px-6">
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row items-center justify-between gap-8 mb-16 px-4">
+          <div className="flex flex-col items-center md:items-start text-center md:text-left">
+            <h2 className="text-4xl md:text-6xl font-hero font-bold text-[#E6B325] tracking-tight mb-4 drop-shadow-2xl">
+              The Tap List
+            </h2>
+            <div className="w-24 h-[1px] bg-[#E6B325]/40" />
+          </div>
 
-      <div className="max-w-6xl mx-auto px-4 py-16">
-        {/* Header */}
-        <div className="header-container scroll-animate">
-          <h2 className="section-title">
-            <Hop className="w-10 h-10 text-brewery-gold animate-float" />
-            Our Beers
-            <BeerIcon className="w-10 h-10 text-brewery-gold animate-float-delay" />
-          </h2>
           <button
-            className="filter-btn touch-target"
+            className="group flex items-center gap-3 bg-[#1A120E]/40 hover:bg-[#E6B325] text-[#E6B325] hover:text-[#120A07] border border-[#E6B325]/30 px-8 py-4 rounded-full transition-all duration-500 font-body uppercase tracking-[0.2em] text-xs shadow-xl backdrop-blur-md"
             onClick={() => setShowAvailable((v) => !v)}
             aria-pressed={showAvailable}
             type="button"
           >
-            <Hop className="w-5 h-5" />
-            {showAvailable ? 'Show All Beers' : 'Show Available Only'}
+            <Hop className="w-4 h-4 group-hover:rotate-12 transition-transform" />
+            {showAvailable ? 'Show All Brews' : 'Show Available Only'}
           </button>
         </div>
 
-        {/* Beer List */}
-        <div className="beer-list scroll-animate">
+        {/* Beer Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 scroll-animate">
           {filteredBeers.length === 0 ? (
-            <div className="no-beers">No beers found.</div>
+            <div className="col-span-full py-20 text-center">
+              <p className="text-[#C68642] font-body uppercase tracking-[0.2em] text-sm animate-pulse">
+                Tapping new kegs soon...
+              </p>
+            </div>
           ) : (
             filteredBeers.map((beer, idx) => (
               <div
                 key={beer._id}
-                className={`beer-item mobile-optimized ${!beer.available ? 'unavailable' : ''} ${beer.featured ? 'featured' : ''}`}
-                style={{ animationDelay: `${idx * 100}ms` }}
+                className={`group relative flex flex-col sm:flex-row bg-[#1A120E]/25 backdrop-blur-2xl rounded-[2rem] border border-[#E6B325]/10 hover:border-[#E6B325]/40 transition-all duration-500 hover:-translate-y-1 p-6 sm:p-8 overflow-hidden ${!beer.available ? 'opacity-40 grayscale' : ''} ${beer.featured ? 'shadow-[0_0_40px_-10px_rgba(230,179,37,0.2)]' : ''}`}
+                style={{ transitionDelay: `${idx * 50}ms` }}
               >
-                {/* Beer Image */}
-                {beer.image?.asset?.url && (
-                  <div className="beer-image">
-                    {imagesLoaded[beer._id] === true ? (
-                      <img
-                        src={beer.image.asset.url}
-                        alt={beer.name}
-                        className="beer-img"
-                        loading="lazy"
-                        onLoad={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.style.opacity = '1';
-                        }}
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.style.display = 'none';
-                        }}
-                      />
-                    ) : imagesLoaded[beer._id] === false ? (
-                      <div className="image-fallback">
-                        <BeerIcon className="w-8 h-8 text-brewery-gold" />
-                      </div>
-                    ) : (
-                      <div className="image-loading">
-                        <BeerIcon className="w-8 h-8 text-brewery-gold animate-pulse" />
-                      </div>
-                    )}
-                  </div>
-                )}
+                {/* Liquid Glow Effect */}
+                <div className="absolute inset-0 bg-gradient-to-br from-[#E6B325]/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
-                {/* Beer Info */}
-                <div className="beer-info">
-                  <div className="beer-header">
-                    <div className="beer-name-section">
-                      <h3 className="beer-name">
-                        {beer.featured && <Star className="w-5 h-5 text-brewery-gold fill-current" />}
+                {/* Beer Visual */}
+                <div className="relative flex-shrink-0 w-32 h-32 sm:w-40 sm:h-40 rounded-3xl bg-[#120A07] overflow-hidden border border-[#E6B325]/5 mb-6 sm:mb-0 sm:mr-8 flex items-center justify-center p-4">
+                  {beer.image?.asset?.url ? (
+                    <img
+                      src={beer.image.asset.url}
+                      alt={beer.name}
+                      className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-110"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div className="flex items-center justify-center">
+                      <BeerIcon className="w-16 h-16 text-[#E6B325]/10 group-hover:text-[#E6B325]/20 transition-colors" />
+                    </div>
+                  )}
+                  {beer.featured && (
+                    <div className="absolute top-3 right-3">
+                      <Star className="w-4 h-4 text-[#E6B325] fill-current drop-shadow-[0_0_8px_rgba(230,179,37,0.6)]" />
+                    </div>
+                  )}
+                </div>
+
+                {/* Beer Details */}
+                <div className="flex-grow flex flex-col justify-between relative z-10">
+                  <div>
+                    <div className="flex items-start justify-between gap-4 mb-3">
+                      <h3 className="text-2xl md:text-3xl font-hero font-bold text-[#FDF5E6] tracking-tight group-hover:text-[#E6B325] transition-colors leading-tight">
                         {beer.name}
-                        {!beer.available && <span className="unavailable-badge">Unavailable</span>}
                       </h3>
-                      <p className="beer-description">{beer.description}</p>
+                      <div className="text-xl font-hero font-bold text-[#C68642]/80 group-hover:text-[#E6B325] transition-colors whitespace-nowrap">
+                        ${beer.price.toFixed(2)}
+                      </div>
                     </div>
-                    <div className="beer-price">
-                      ${beer.price.toFixed(2)}
-                    </div>
+
+                    <p className="text-[#FDF5E6]/60 font-body text-sm leading-relaxed mb-6 line-clamp-2 italic">
+                      {beer.description}
+                    </p>
                   </div>
 
-                  <div className="beer-specs">
-                    <div className="spec-item">
+                  <div className="flex flex-wrap items-center gap-6 border-t border-[#E6B325]/10 pt-6 mt-auto">
+                    <div className="flex items-center gap-2 text-[#E6B325]/80">
                       {getBeerIcon(beer.type)}
-                      <span className="spec-label">Type:</span>
-                      <span className="spec-value">{beer.type}</span>
+                      <span className="text-[10px] font-body font-bold uppercase tracking-widest leading-none mt-0.5">{beer.type}</span>
                     </div>
-                    <div className="spec-item">
-                      <span className="spec-label">ABV:</span>
-                      <span className="spec-value">{beer.abv}%</span>
+                    <div className="flex items-center gap-2 text-[#C68642]">
+                      <Award className="w-4 h-4 opacity-60" />
+                      <span className="text-[10px] font-body font-bold uppercase tracking-widest leading-none mt-0.5">{beer.abv}% ABV</span>
                     </div>
                     {beer.ibu !== undefined && (
-                      <div className="spec-item">
-                        <span className="spec-label">IBU:</span>
-                        <span className="spec-value">{beer.ibu}</span>
+                      <div className="flex items-center gap-2 text-[#C68642]">
+                        <GlassWater className="w-4 h-4 opacity-60" />
+                        <span className="text-[10px] font-body font-bold uppercase tracking-widest leading-none mt-0.5">{beer.ibu} IBU</span>
                       </div>
                     )}
                   </div>
@@ -260,233 +253,26 @@ export default function BeerMenu() {
         </div>
       </div>
 
-      <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&family=Oswald:wght@400;600;700&display=swap');
-
-        .beer-menu-section {
-          position: relative;
-          min-height: 60vh;
-          background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-          color: #fffbe6;
+      <style jsx>{`
+        .font-hero {
+          font-family: var(--font-serif);
+        }
+        
+        .font-body {
+          font-family: var(--font-sans);
         }
 
-        .section-divider {
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          z-index: 10;
+        .animate-float {
+          animation: float 3s ease-in-out infinite;
         }
 
-        .header-container {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 2rem;
-          margin-bottom: 3rem;
-          transition-delay: 0.1s;
+        .animate-float-delay {
+          animation: float 3s ease-in-out infinite 1.5s;
         }
 
-        @media (min-width: 768px) {
-          .header-container {
-            flex-direction: row;
-            justify-content: space-between;
-          }
-        }
-
-        .section-title {
-          font-family: 'Montserrat', sans-serif;
-          font-size: clamp(2rem, 6vw, 4rem);
-          font-weight: 900;
-          color: #DAA520;
-          text-shadow: 0 2px 24px #8B4513cc, 0 1px 0 #fff3;
-          letter-spacing: 0.04em;
-          line-height: 1.1;
-          display: flex;
-          align-items: center;
-          gap: 1rem;
-          text-align: center;
-        }
-
-        .filter-btn {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          background: linear-gradient(135deg, #DAA520 0%, #ffe066 100%);
-          color: #1a1a1a;
-          border: none;
-          padding: 1rem 2rem;
-          border-radius: 2rem;
-          font-family: 'Oswald', sans-serif;
-          font-weight: 600;
-          font-size: 1rem;
-          box-shadow: 0 4px 16px rgba(218, 165, 32, 0.3);
-          transition: all 0.3s ease;
-          cursor: pointer;
-        }
-
-        .filter-btn:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 6px 20px rgba(218, 165, 32, 0.4);
-          background: linear-gradient(135deg, #ffe066 0%, #DAA520 100%);
-        }
-
-        .beer-list {
-          display: flex;
-          flex-direction: column;
-          gap: 1.5rem;
-          transition-delay: 0.2s;
-        }
-
-        .beer-item {
-          display: flex;
-          background: linear-gradient(135deg, rgba(255, 251, 230, 0.95) 0%, rgba(255, 224, 102, 0.9) 100%);
-          border-radius: 1rem;
-          padding: 1.5rem;
-          box-shadow: 0 4px 24px rgba(139, 69, 19, 0.3);
-          border: 2px solid transparent;
-          transition: all 0.3s ease;
-          animation: slideInUp 0.6s ease forwards;
-          color: #1a1a1a;
-        }
-
-        .beer-item:hover {
-          transform: translateY(-4px) translateZ(0);
-          box-shadow: 0 8px 32px rgba(139, 69, 19, 0.4);
-          border-color: #DAA520;
-        }
-
-        .beer-item.featured {
-          border-color: #DAA520;
-          box-shadow: 0 4px 24px rgba(218, 165, 32, 0.4), 0 0 0 4px rgba(218, 165, 32, 0.1);
-        }
-
-        .beer-item.unavailable {
-          opacity: 0.6;
-          filter: grayscale(0.5);
-        }
-
-        .beer-image {
-          flex-shrink: 0;
-          width: 80px;
-          height: 80px;
-          border-radius: 0.75rem;
-          overflow: hidden;
-          background: rgba(255, 255, 255, 0.8);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          margin-right: 1.5rem;
-        }
-
-        .beer-img {
-          width: 100%;
-          height: 100%;
-          object-fit: contain;
-          opacity: 0;
-          transition: opacity 0.3s ease;
-          -webkit-transform: translateZ(0);
-          transform: translateZ(0);
-          -webkit-backface-visibility: hidden;
-          backface-visibility: hidden;
-        }
-
-        .image-fallback,
-        .image-loading {
-          width: 100%;
-          height: 100%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background: rgba(218, 165, 32, 0.1);
-        }
-
-        .beer-info {
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-          gap: 1rem;
-        }
-
-        .beer-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: flex-start;
-          gap: 1rem;
-        }
-
-        .beer-name-section {
-          flex: 1;
-        }
-
-        .beer-name {
-          font-family: 'Montserrat', sans-serif;
-          font-size: 1.5rem;
-          font-weight: 700;
-          color: #8B4513;
-          margin: 0 0 0.5rem 0;
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          flex-wrap: wrap;
-        }
-
-        .unavailable-badge {
-          background: #dc3545;
-          color: white;
-          font-size: 0.75rem;
-          padding: 0.25rem 0.5rem;
-          border-radius: 1rem;
-          font-weight: 600;
-        }
-
-        .beer-description {
-          font-family: 'Montserrat', sans-serif;
-          font-size: 1rem;
-          color: #5a5a5a;
-          line-height: 1.5;
-          margin: 0;
-        }
-
-        .beer-price {
-          font-family: 'Oswald', sans-serif;
-          font-size: 2rem;
-          font-weight: 700;
-          color: #DAA520;
-          text-shadow: 0 1px 2px rgba(139, 69, 19, 0.3);
-          flex-shrink: 0;
-        }
-
-        .beer-specs {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 1.5rem;
-        }
-
-        .spec-item {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          font-family: 'Oswald', sans-serif;
-          font-size: 0.9rem;
-        }
-
-        .spec-label {
-          font-weight: 600;
-          color: #8B4513;
-        }
-
-        .spec-value {
-          font-weight: 700;
-          color: #DAA520;
-        }
-
-        .no-beers {
-          text-align: center;
-          font-family: 'Montserrat', sans-serif;
-          font-size: 1.2rem;
-          color: #DAA520;
-          padding: 3rem;
+        @keyframes float {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-10px); }
         }
 
         .loading-container {
@@ -507,72 +293,17 @@ export default function BeerMenu() {
         }
 
         .loading-text {
-          font-family: 'Montserrat', sans-serif;
+          font-family: var(--font-sans);
           font-size: 1.1rem;
           color: #DAA520;
         }
 
         .error-message {
           text-align: center;
-          font-family: 'Montserrat', sans-serif;
+          font-family: var(--font-sans);
           font-size: 1.2rem;
           color: #dc3545;
           padding: 3rem;
-        }
-
-        /* Mobile responsive */
-        @media (max-width: 768px) {
-          .beer-item {
-            flex-direction: column;
-            text-align: center;
-          }
-
-          .beer-image {
-            align-self: center;
-            margin-right: 0;
-            margin-bottom: 1rem;
-            width: 100px;
-            height: 100px;
-          }
-
-          .beer-header {
-            flex-direction: column;
-            text-align: center;
-            gap: 0.5rem;
-          }
-
-          .beer-specs {
-            justify-content: center;
-          }
-
-          .spec-item {
-            font-size: 0.9rem;
-          }
-
-          .beer-price {
-            font-size: 1.75rem;
-          }
-
-          .section-title {
-            font-size: clamp(1.5rem, 8vw, 2.5rem);
-          }
-
-          .filter-btn {
-            padding: 0.875rem 1.75rem;
-            font-size: 0.9rem;
-          }
-        }
-
-        /* Animations */
-        @keyframes slideInUp {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
         }
 
         @keyframes spin {
